@@ -1,0 +1,59 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red212\green212\blue212;
+\red100\green117\blue135;\red70\green137\blue204;\red36\green168\blue107;\red83\green83\blue83;\red167\green197\blue152;
+}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c86275\c86275\c86275;
+\cssrgb\c46667\c53333\c60000;\cssrgb\c33725\c61176\c83922;\cssrgb\c14118\c70588\c49412;\cssrgb\c40000\c40000\c40000;\cssrgb\c70980\c80784\c65882;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 DECLARE\
+  course_record RECORD\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  new_enrollment_id UUID\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  new_invoice_id UUID\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  user_email TEXT\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  calculated_due_date DATE\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  period_start DATE\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+BEGIN\
+  IF OLD\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 status \cf5 \cb3 \strokec5 IS\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 DISTINCT\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 FROM\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'confirmed'\cf2 \cb3 \strokec2  \cf5 \cb3 \strokec5 AND\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 status \cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'confirmed'\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 THEN\cf2 \cb3 \strokec2 \
+    \
+    \cf6 \cb3 \strokec6 SELECT\cf2 \cb3 \strokec2  start_date\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  price \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  course_record \cf6 \cb3 \strokec6 FROM\cf2 \cb3 \strokec2  public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 courses \cf6 \cb3 \strokec6 WHERE\cf2 \cb3 \strokec2  id \cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 course_id\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+    \cf6 \cb3 \strokec6 SELECT\cf2 \cb3 \strokec2  email \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  user_email \cf6 \cb3 \strokec6 FROM\cf2 \cb3 \strokec2  public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 users \cf6 \cb3 \strokec6 WHERE\cf2 \cb3 \strokec2  id \cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+    \cf8 \cb3 \strokec8 -- Start des Abrechnungszeitraums ist entweder das Kurs-Startdatum oder heute\cf2 \cb3 \strokec2 \
+    period_start :\cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  COALESCE\cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 course_record\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 start_date\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  CURRENT_DATE\cf4 \cb3 \strokec4 );\cf2 \cb3 \strokec2 \
+\
+    IF course_record\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 start_date \cf5 \cb3 \strokec5 IS\cf2 \cb3 \strokec2  \cf5 \cb3 \strokec5 NOT\cf2 \cb3 \strokec2  \cf5 \cb3 \strokec5 NULL\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 THEN\cf2 \cb3 \strokec2 \
+      calculated_due_date :\cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  course_record\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 start_date \cf5 \cb3 \strokec5 -\cf2 \cb3 \strokec2  INTERVAL \cf7 \cb3 \strokec7 '3 days'\cf4 \strokec4 ;\cf2 \cb3 \strokec2 \
+    \cf6 \cb3 \strokec6 ELSE\cf2 \cb3 \strokec2 \
+      calculated_due_date :\cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  CURRENT_DATE \cf5 \cb3 \strokec5 +\cf2 \cb3 \strokec2  INTERVAL \cf7 \cb3 \strokec7 '14 days'\cf4 \strokec4 ;\cf2 \cb3 \strokec2 \
+    \cf6 \cb3 \strokec6 END\cf2 \cb3 \strokec2  IF\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+    INSERT \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 enrollments \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  course_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  registration_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  status\cf4 \cb3 \strokec4 )\cf2 \cb3 \strokec2 \
+    VALUES \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 course_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'active'\cf4 \strokec4 )\cf2 \cb3 \strokec2 \
+    \cf6 \cb3 \strokec6 RETURNING\cf2 \cb3 \strokec2  id \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  new_enrollment_id\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+    \cf8 \cb3 \strokec8 -- HIER DIE ERWEITERUNG: billing_period_start und _end werden gesetzt\cf2 \cb3 \strokec2 \
+    INSERT \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 invoices \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  enrollment_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  amount\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  due_date\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  status\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  billing_period_start\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  billing_period_end\cf4 \cb3 \strokec4 )\cf2 \cb3 \strokec2 \
+    VALUES \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 \
+      NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  new_enrollment_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  course_record\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 price\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  calculated_due_date\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'pending'\cf4 \strokec4 ,\cf2 \cb3 \strokec2 \
+      period_start\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf8 \cb3 \strokec8 -- Start des Zeitraums\cf2 \cb3 \strokec2 \
+      period_start \cf5 \cb3 \strokec5 +\cf2 \cb3 \strokec2  INTERVAL \cf7 \cb3 \strokec7 '28 days'\cf2 \cb3 \strokec2  \cf5 \cb3 \strokec5 -\cf2 \cb3 \strokec2  INTERVAL \cf7 \cb3 \strokec7 '1 day'\cf2 \cb3 \strokec2  \cf8 \cb3 \strokec8 -- Ende des Zeitraums (4 Wochen)\cf2 \cb3 \strokec2 \
+    \cf4 \cb3 \strokec4 )\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 RETURNING\cf2 \cb3 \strokec2  id \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  new_invoice_id\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+    UPDATE public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 courses SET current_participants \cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  current_participants \cf5 \cb3 \strokec5 +\cf2 \cb3 \strokec2  \cf9 \cb3 \strokec9 1\cf2 \cb3 \strokec2  \cf6 \cb3 \strokec6 WHERE\cf2 \cb3 \strokec2  id \cf5 \cb3 \strokec5 =\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 course_id\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+    INSERT \cf6 \cb3 \strokec6 INTO\cf2 \cb3 \strokec2  public\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 email_logs \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  registration_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  email_type\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  recipient_email\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  subject\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  status\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  metadata\cf4 \cb3 \strokec4 )\cf2 \cb3 \strokec2 \
+    VALUES \cf4 \cb3 \strokec4 (\cf2 \cb3 \strokec2 NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 user_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'invoice'\cf4 \strokec4 ,\cf2 \cb3 \strokec2  user_email\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'Ihre Rechnung f\'fcr den SmartGerman Kurs'\cf4 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'pending'\cf4 \strokec4 ,\cf2 \cb3 \strokec2 \
+      jsonb_build_object\cf4 \cb3 \strokec4 (\cf7 \strokec7 'invoice_id'\cf4 \strokec4 ,\cf2 \cb3 \strokec2  new_invoice_id\cf4 \cb3 \strokec4 ,\cf2 \cb3 \strokec2  \cf7 \cb3 \strokec7 'course_id'\cf4 \strokec4 ,\cf2 \cb3 \strokec2  NEW\cf4 \cb3 \strokec4 .\cf2 \cb3 \strokec2 course_id\cf4 \cb3 \strokec4 )\cf2 \cb3 \strokec2 \
+    \cf4 \cb3 \strokec4 );\cf2 \cb3 \strokec2 \
+  \cf6 \cb3 \strokec6 END\cf2 \cb3 \strokec2  IF\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+  RETURN NEW\cf4 \cb3 \strokec4 ;\cf2 \cb3 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 END\cf4 \strokec4 ;\cf2 \cb3 \strokec2 \
+\
+}
