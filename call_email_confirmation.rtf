@@ -1,0 +1,54 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red212\green212\blue212;
+\red83\green83\blue83;\red70\green137\blue204;\red100\green117\blue135;\red36\green168\blue107;\red167\green197\blue152;
+}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c86275\c86275\c86275;
+\cssrgb\c40000\c40000\c40000;\cssrgb\c33725\c61176\c83922;\cssrgb\c46667\c53333\c60000;\cssrgb\c14118\c70588\c49412;\cssrgb\c70980\c80784\c65882;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 DECLARE\
+    response_data jsonb\cf4 \strokec4 ;\cf2 \strokec2 \
+    pending_count INTEGER\cf4 \strokec4 ;\cf2 \strokec2 \
+    http_response jsonb\cf4 \strokec4 ;\cf2 \strokec2 \
+BEGIN\
+    \cf5 \strokec5 -- Zuerst pr\'fcfen, wie viele unbest\'e4tigte Registrierungen vorhanden sind\cf2 \strokec2 \
+    \cf6 \strokec6 SELECT\cf2 \strokec2  COUNT\cf4 \strokec4 (\cf7 \strokec7 *\cf4 \strokec4 )\cf2 \strokec2  \cf6 \strokec6 INTO\cf2 \strokec2  pending_count\
+    \cf6 \strokec6 FROM\cf2 \strokec2  registrations r\
+    \cf6 \strokec6 WHERE\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 confirmation_sent \cf7 \strokec7 =\cf2 \strokec2  \cf6 \strokec6 false\cf2 \strokec2  \
+    \cf7 \strokec7 AND\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 status \cf7 \strokec7 =\cf2 \strokec2  \cf8 \strokec8 'pending'\cf4 \strokec4 ;\cf2 \strokec2 \
+    \
+    \cf5 \strokec5 -- HTTP-Call zur Edge Function (KORRIGIERTER NAME!)\cf2 \strokec2 \
+    BEGIN\
+        \cf6 \strokec6 SELECT\cf2 \strokec2  \cf6 \strokec6 INTO\cf2 \strokec2  http_response\
+            net\cf4 \strokec4 .\cf2 \strokec2 http_post\cf4 \strokec4 (\cf2 \strokec2 \
+                url :\cf7 \strokec7 =\cf2 \strokec2  \cf8 \strokec8 'https://chvsjeddwbcvflqsxvkq.supabase.co/functions/v1/send-confirmation-emails'\cf4 \strokec4 ,\cf2 \strokec2 \
+                headers :\cf7 \strokec7 =\cf2 \strokec2  jsonb_build_object\cf4 \strokec4 (\cf2 \strokec2 \
+                    \cf8 \strokec8 'Content-Type'\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'application/json'\cf2 \strokec2 \
+                \cf4 \strokec4 ),\cf2 \strokec2 \
+                body :\cf7 \strokec7 =\cf2 \strokec2  jsonb_build_object\cf4 \strokec4 (\cf8 \strokec8 'time'\cf4 \strokec4 ,\cf2 \strokec2  now\cf4 \strokec4 (),\cf2 \strokec2  \cf8 \strokec8 'trigger'\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'cron_job'\cf4 \strokec4 ),\cf2 \strokec2 \
+                timeout_milliseconds :\cf7 \strokec7 =\cf2 \strokec2  \cf9 \strokec9 15000\cf2 \strokec2 \
+            \cf4 \strokec4 );\cf2 \strokec2 \
+        \
+        \cf5 \strokec5 -- Erfolgreiches Ergebnis zur\'fcckgeben\cf2 \strokec2 \
+        RETURN QUERY \cf6 \strokec6 SELECT\cf2 \strokec2  \
+            \cf8 \strokec8 'success'\cf2 \strokec2 ::TEXT\cf4 \strokec4 ,\cf2 \strokec2 \
+            format\cf4 \strokec4 (\cf8 \strokec8 'Function called successfully. Found %s pending registrations.'\cf4 \strokec4 ,\cf2 \strokec2  pending_count\cf4 \strokec4 )\cf2 \strokec2 ::TEXT\cf4 \strokec4 ,\cf2 \strokec2 \
+            COALESCE\cf4 \strokec4 ((\cf2 \strokec2 http_response\cf7 \strokec7 ->>\cf8 \strokec8 'status_code'\cf4 \strokec4 )\cf2 \strokec2 ::INTEGER\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 0\cf4 \strokec4 ),\cf2 \strokec2 \
+            pending_count\cf4 \strokec4 ;\cf2 \strokec2 \
+            \
+    EXCEPTION \cf6 \strokec6 WHEN\cf2 \strokec2  OTHERS \cf6 \strokec6 THEN\cf2 \strokec2 \
+        \cf5 \strokec5 -- Fehler-Ergebnis zur\'fcckgeben\cf2 \strokec2 \
+        RETURN QUERY \cf6 \strokec6 SELECT\cf2 \strokec2  \
+            \cf8 \strokec8 'error'\cf2 \strokec2 ::TEXT\cf4 \strokec4 ,\cf2 \strokec2 \
+            format\cf4 \strokec4 (\cf8 \strokec8 'Error calling function: %s'\cf4 \strokec4 ,\cf2 \strokec2  SQLERRM\cf4 \strokec4 )\cf2 \strokec2 ::TEXT\cf4 \strokec4 ,\cf2 \strokec2 \
+            \cf9 \strokec9 0\cf4 \strokec4 ,\cf2 \strokec2 \
+            pending_count\cf4 \strokec4 ;\cf2 \strokec2 \
+    \cf6 \strokec6 END\cf4 \strokec4 ;\cf2 \strokec2 \
+\cf6 \strokec6 END\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+}
