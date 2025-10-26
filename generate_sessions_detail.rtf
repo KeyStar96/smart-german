@@ -1,0 +1,101 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red100\green117\blue135;
+\red36\green168\blue107;\red212\green212\blue212;\red167\green197\blue152;\red83\green83\blue83;\red70\green137\blue204;
+}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c46667\c53333\c60000;
+\cssrgb\c14118\c70588\c49412;\cssrgb\c86275\c86275\c86275;\cssrgb\c70980\c80784\c65882;\cssrgb\c40000\c40000\c40000;\cssrgb\c33725\c61176\c83922;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 DECLARE\
+    v_sessions JSONB :\cf4 \strokec4 =\cf2 \strokec2  \cf5 \strokec5 '[]'\cf2 \strokec2 ::jsonb\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_session_obj JSONB\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_schedule RECORD\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_current_date DATE\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_units_per_session INTEGER\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_session_count INTEGER :\cf4 \strokec4 =\cf2 \strokec2  \cf7 \strokec7 0\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_expected_sessions INTEGER\cf6 \strokec6 ;\cf2 \strokec2 \
+    v_duration_minutes INTEGER\cf6 \strokec6 ;\cf2 \strokec2 \
+BEGIN\
+    \cf8 \strokec8 -- Hole Schedule-Info mit Wochentagen und Zeiten\cf2 \strokec2 \
+    \cf9 \strokec9 SELECT\cf2 \strokec2  \
+        weekdays\cf6 \strokec6 ,\cf2 \strokec2 \
+        start_time\cf6 \strokec6 ,\cf2 \strokec2 \
+        end_time\cf6 \strokec6 ,\cf2 \strokec2 \
+        units_count\
+    \cf9 \strokec9 INTO\cf2 \strokec2  v_schedule\
+    \cf9 \strokec9 FROM\cf2 \strokec2  course_monthly_schedules\
+    \cf9 \strokec9 WHERE\cf2 \strokec2  course_id \cf4 \strokec4 =\cf2 \strokec2  p_course_id\
+    \cf4 \strokec4 AND\cf2 \strokec2  month_start \cf4 \strokec4 =\cf2 \strokec2  p_month_start\
+    \cf4 \strokec4 AND\cf2 \strokec2  is_active \cf4 \strokec4 =\cf2 \strokec2  \cf9 \strokec9 true\cf2 \strokec2 \
+    \cf9 \strokec9 LIMIT\cf2 \strokec2  \cf7 \strokec7 1\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    \cf8 \strokec8 -- Fallback falls keine Schedule-Info gefunden\cf2 \strokec2 \
+    IF v_schedule\cf6 \strokec6 .\cf2 \strokec2 weekdays \cf4 \strokec4 IS\cf2 \strokec2  \cf4 \strokec4 NULL\cf2 \strokec2  \cf4 \strokec4 OR\cf2 \strokec2  array_length\cf6 \strokec6 (\cf2 \strokec2 v_schedule\cf6 \strokec6 .\cf2 \strokec2 weekdays\cf6 \strokec6 ,\cf2 \strokec2  \cf7 \strokec7 1\cf6 \strokec6 )\cf2 \strokec2  \cf4 \strokec4 =\cf2 \strokec2  \cf7 \strokec7 0\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \strokec2 \
+        \cf8 \strokec8 -- Generiere generische Termine\cf2 \strokec2 \
+        v_units_per_session :\cf4 \strokec4 =\cf2 \strokec2  GREATEST\cf6 \strokec6 (\cf7 \strokec7 1\cf6 \strokec6 ,\cf2 \strokec2  p_units_count \cf4 \strokec4 /\cf2 \strokec2  \cf7 \strokec7 4\cf6 \strokec6 );\cf2 \strokec2   \cf8 \strokec8 -- Annahme: ~4 Termine\cf2 \strokec2 \
+        \
+        \cf9 \strokec9 FOR\cf2 \strokec2  v_session_count \cf4 \strokec4 IN\cf2 \strokec2  \cf7 \strokec7 1.\cf6 \strokec6 .(\cf2 \strokec2 p_units_count \cf4 \strokec4 /\cf2 \strokec2  v_units_per_session\cf6 \strokec6 )\cf2 \strokec2  LOOP\
+            v_session_obj :\cf4 \strokec4 =\cf2 \strokec2  jsonb_build_object\cf6 \strokec6 (\cf2 \strokec2 \
+                \cf5 \strokec5 'date'\cf6 \strokec6 ,\cf2 \strokec2  \cf4 \strokec4 NULL\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'weekday_name'\cf6 \strokec6 ,\cf2 \strokec2  \cf5 \strokec5 'Termin '\cf2 \strokec2  \cf4 \strokec4 ||\cf2 \strokec2  v_session_count\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'date_formatted'\cf6 \strokec6 ,\cf2 \strokec2  \cf4 \strokec4 NULL\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'time'\cf6 \strokec6 ,\cf2 \strokec2  \cf4 \strokec4 NULL\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'units'\cf6 \strokec6 ,\cf2 \strokec2  v_units_per_session\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'duration_minutes'\cf6 \strokec6 ,\cf2 \strokec2  v_units_per_session \cf4 \strokec4 *\cf2 \strokec2  \cf7 \strokec7 45\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'price_per_unit'\cf6 \strokec6 ,\cf2 \strokec2  p_price_per_unit\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'total'\cf6 \strokec6 ,\cf2 \strokec2  v_units_per_session \cf4 \strokec4 *\cf2 \strokec2  p_price_per_unit\
+            \cf6 \strokec6 );\cf2 \strokec2 \
+            \
+            v_sessions :\cf4 \strokec4 =\cf2 \strokec2  v_sessions \cf4 \strokec4 ||\cf2 \strokec2  jsonb_build_array\cf6 \strokec6 (\cf2 \strokec2 v_session_obj\cf6 \strokec6 );\cf2 \strokec2 \
+        \cf9 \strokec9 END\cf2 \strokec2  LOOP\cf6 \strokec6 ;\cf2 \strokec2 \
+        \
+        RETURN v_sessions\cf6 \strokec6 ;\cf2 \strokec2 \
+    \cf9 \strokec9 END\cf2 \strokec2  IF\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    \cf8 \strokec8 -- Berechne Dauer in Minuten\cf2 \strokec2 \
+    v_duration_minutes :\cf4 \strokec4 =\cf2 \strokec2  EXTRACT\cf6 \strokec6 (\cf2 \strokec2 EPOCH \cf9 \strokec9 FROM\cf2 \strokec2  \cf6 \strokec6 (\cf2 \strokec2 v_schedule\cf6 \strokec6 .\cf2 \strokec2 end_time \cf4 \strokec4 -\cf2 \strokec2  v_schedule\cf6 \strokec6 .\cf2 \strokec2 start_time\cf6 \strokec6 ))\cf2 \strokec2  \cf4 \strokec4 /\cf2 \strokec2  \cf7 \strokec7 60\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    \cf8 \strokec8 -- Berechne Units pro Termin\cf2 \strokec2 \
+    v_units_per_session :\cf4 \strokec4 =\cf2 \strokec2  \cf9 \strokec9 CASE\cf2 \strokec2  \
+        \cf9 \strokec9 WHEN\cf2 \strokec2  v_duration_minutes \cf4 \strokec4 <=\cf2 \strokec2  \cf7 \strokec7 60\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \strokec2  \cf7 \strokec7 1\cf2 \strokec2 \
+        \cf9 \strokec9 WHEN\cf2 \strokec2  v_duration_minutes \cf4 \strokec4 <=\cf2 \strokec2  \cf7 \strokec7 90\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \strokec2  \cf7 \strokec7 2\cf2 \strokec2 \
+        \cf9 \strokec9 ELSE\cf2 \strokec2  \cf7 \strokec7 3\cf2 \strokec2 \
+    \cf9 \strokec9 END\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    \cf8 \strokec8 -- Berechne erwartete Anzahl Termine\cf2 \strokec2 \
+    v_expected_sessions :\cf4 \strokec4 =\cf2 \strokec2  p_units_count \cf4 \strokec4 /\cf2 \strokec2  v_units_per_session\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    \cf8 \strokec8 -- Durchlaufe alle Tage im Monat\cf2 \strokec2 \
+    v_current_date :\cf4 \strokec4 =\cf2 \strokec2  p_month_start\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    WHILE v_current_date \cf4 \strokec4 <=\cf2 \strokec2  p_month_end \cf4 \strokec4 AND\cf2 \strokec2  v_session_count \cf4 \strokec4 <\cf2 \strokec2  v_expected_sessions LOOP\
+        \cf8 \strokec8 -- Pr\'fcfe ob dieser Tag ein Kurstag ist\cf2 \strokec2 \
+        IF EXTRACT\cf6 \strokec6 (\cf2 \strokec2 ISODOW \cf9 \strokec9 FROM\cf2 \strokec2  v_current_date\cf6 \strokec6 )\cf2 \strokec2 ::INTEGER \cf4 \strokec4 =\cf2 \strokec2  ANY\cf6 \strokec6 (\cf2 \strokec2 v_schedule\cf6 \strokec6 .\cf2 \strokec2 weekdays\cf6 \strokec6 )\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \strokec2 \
+            v_session_obj :\cf4 \strokec4 =\cf2 \strokec2  jsonb_build_object\cf6 \strokec6 (\cf2 \strokec2 \
+                \cf5 \strokec5 'date'\cf6 \strokec6 ,\cf2 \strokec2  v_current_date\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'weekday_name'\cf6 \strokec6 ,\cf2 \strokec2  get_german_weekday_name\cf6 \strokec6 (\cf2 \strokec2 EXTRACT\cf6 \strokec6 (\cf2 \strokec2 ISODOW \cf9 \strokec9 FROM\cf2 \strokec2  v_current_date\cf6 \strokec6 )\cf2 \strokec2 ::INTEGER\cf6 \strokec6 ),\cf2 \strokec2 \
+                \cf5 \strokec5 'date_formatted'\cf6 \strokec6 ,\cf2 \strokec2  TO_CHAR\cf6 \strokec6 (\cf2 \strokec2 v_current_date\cf6 \strokec6 ,\cf2 \strokec2  \cf5 \strokec5 'DD.MM.YYYY'\cf6 \strokec6 ),\cf2 \strokec2 \
+                \cf5 \strokec5 'time'\cf6 \strokec6 ,\cf2 \strokec2  v_schedule\cf6 \strokec6 .\cf2 \strokec2 start_time::TEXT \cf4 \strokec4 ||\cf2 \strokec2  \cf5 \strokec5 '-'\cf2 \strokec2  \cf4 \strokec4 ||\cf2 \strokec2  v_schedule\cf6 \strokec6 .\cf2 \strokec2 end_time::TEXT\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'units'\cf6 \strokec6 ,\cf2 \strokec2  v_units_per_session\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'duration_minutes'\cf6 \strokec6 ,\cf2 \strokec2  v_duration_minutes\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'price_per_unit'\cf6 \strokec6 ,\cf2 \strokec2  p_price_per_unit\cf6 \strokec6 ,\cf2 \strokec2 \
+                \cf5 \strokec5 'total'\cf6 \strokec6 ,\cf2 \strokec2  v_units_per_session \cf4 \strokec4 *\cf2 \strokec2  p_price_per_unit\
+            \cf6 \strokec6 );\cf2 \strokec2 \
+            \
+            v_sessions :\cf4 \strokec4 =\cf2 \strokec2  v_sessions \cf4 \strokec4 ||\cf2 \strokec2  jsonb_build_array\cf6 \strokec6 (\cf2 \strokec2 v_session_obj\cf6 \strokec6 );\cf2 \strokec2 \
+            v_session_count :\cf4 \strokec4 =\cf2 \strokec2  v_session_count \cf4 \strokec4 +\cf2 \strokec2  \cf7 \strokec7 1\cf6 \strokec6 ;\cf2 \strokec2 \
+        \cf9 \strokec9 END\cf2 \strokec2  IF\cf6 \strokec6 ;\cf2 \strokec2 \
+        \
+        v_current_date :\cf4 \strokec4 =\cf2 \strokec2  v_current_date \cf4 \strokec4 +\cf2 \strokec2  INTERVAL \cf5 \strokec5 '1 day'\cf6 \strokec6 ;\cf2 \strokec2 \
+    \cf9 \strokec9 END\cf2 \strokec2  LOOP\cf6 \strokec6 ;\cf2 \strokec2 \
+    \
+    RETURN v_sessions\cf6 \strokec6 ;\cf2 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf9 \strokec9 END\cf6 \strokec6 ;\cf2 \strokec2 \
+\
+}
