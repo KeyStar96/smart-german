@@ -11,6 +11,7 @@
 \f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
 \outl0\strokewidth0 \strokec2 DECLARE\
     new_invoice_id UUID\cf4 \strokec4 ;\cf2 \strokec2 \
+    new_enrollment_id UUID\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- ID f\'fcr das neu erstellte Enrollment\cf2 \strokec2 \
     user_email TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
     course_name TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
     was_on_waitlist BOOLEAN\cf4 \strokec4 ;\cf2 \strokec2 \
@@ -23,107 +24,116 @@
     v_description TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
     v_unit_duration_minutes INTEGER\cf4 \strokec4 ;\cf2 \strokec2 \
     v_units_per_slot INTEGER\cf4 \strokec4 ;\cf2 \strokec2 \
-    v_sessions_detail JSONB\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- <--- DER KORREKTE CODE\cf2 \strokec2 \
+    v_sessions_detail JSONB\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    \cf5 \strokec5 -- Variablen f\'fcr F\'e4lligkeitsdatum-Logik\cf2 \strokec2 \
+    v_due_date DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_t_minus_7 DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_t_minus_2 DATE\cf4 \strokec4 ;\cf2 \strokec2 \
 BEGIN\
-    \cf5 \strokec5 -- Nur ausf\'fchren wenn Status auf 'confirmed' wechselt\cf2 \strokec2 \
+    \cf5 \strokec5 -- Nur ausf\'fchren, wenn Status von etwas anderem auf 'confirmed' wechselt\cf2 \strokec2 \
     IF OLD\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 IS\cf2 \strokec2  \cf7 \strokec7 DISTINCT\cf2 \strokec2  \cf7 \strokec7 FROM\cf2 \strokec2  \cf8 \strokec8 'confirmed'\cf2 \strokec2  \cf6 \strokec6 AND\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'confirmed'\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
 \
+        \cf5 \strokec5 -- Pr\'fcfen, ob der Nutzer von der Warteliste kam\cf2 \strokec2 \
         was_on_waitlist :\cf6 \strokec6 =\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 OLD\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'waitlist'\cf4 \strokec4 );\cf2 \strokec2 \
 \
-        \cf5 \strokec5 -- ... (Rest des Codes von Ihrer ZWEITEN Funktion)...\cf2 \strokec2 \
+        \cf5 \strokec5 -- Kursname und User-E-Mail holen\cf2 \strokec2 \
         \cf7 \strokec7 SELECT\cf2 \strokec2  name \cf7 \strokec7 INTO\cf2 \strokec2  course_name \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 courses \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ;\cf2 \strokec2 \
         \cf7 \strokec7 SELECT\cf2 \strokec2  email \cf7 \strokec7 INTO\cf2 \strokec2  user_email \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 users \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ;\cf2 \strokec2 \
 \
+        \cf5 \strokec5 -- N\'e4chsten Monat berechnen (Kursstart ist immer zum n\'e4chsten Monatsersten)\cf2 \strokec2 \
         next_month_start :\cf6 \strokec6 =\cf2 \strokec2  DATE_TRUNC\cf4 \strokec4 (\cf8 \strokec8 'month'\cf4 \strokec4 ,\cf2 \strokec2  CURRENT_DATE \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 month'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
         next_month_end :\cf6 \strokec6 =\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 next_month_start \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 month'\cf2 \strokec2  \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 day'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-        \cf7 \strokec7 SELECT\cf2 \strokec2  \
-            units_count\cf4 \strokec4 ,\cf2 \strokec2 \
-            price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
-            total_price\cf4 \strokec4 ,\cf2 \strokec2 \
-            description\cf4 \strokec4 ,\cf2 \strokec2 \
-            unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
-            units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
-            sessions_detail \cf5 \strokec5 -- <--- KORREKT\cf2 \strokec2 \
-        \cf7 \strokec7 INTO\cf2 \strokec2  \
-            v_units_count\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_total_price\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_description\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_sessions_detail \cf5 \strokec5 -- <--- KORREKT\cf2 \strokec2 \
-        \cf7 \strokec7 FROM\cf2 \strokec2  get_course_price_for_period\cf4 \strokec4 (\cf2 \strokec2 \
-            NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            next_month_start\cf4 \strokec4 ,\cf2 \strokec2 \
-            next_month_end\
-        \cf4 \strokec4 );\cf2 \strokec2 \
+        \cf5 \strokec5 -- Preise und Details f\'fcr den n\'e4chsten Monat holen\cf2 \strokec2 \
+        \cf7 \strokec7 SELECT\cf2 \strokec2 \
+            units_count\cf4 \strokec4 ,\cf2 \strokec2  price_per_unit\cf4 \strokec4 ,\cf2 \strokec2  total_price\cf4 \strokec4 ,\cf2 \strokec2  description\cf4 \strokec4 ,\cf2 \strokec2 \
+            effective_unit_duration\cf4 \strokec4 ,\cf2 \strokec2  units_per_slot\cf4 \strokec4 ,\cf2 \strokec2  sessions_detail\
+        \cf7 \strokec7 INTO\cf2 \strokec2 \
+            v_units_count\cf4 \strokec4 ,\cf2 \strokec2  v_price_per_unit\cf4 \strokec4 ,\cf2 \strokec2  v_total_price\cf4 \strokec4 ,\cf2 \strokec2  v_description\cf4 \strokec4 ,\cf2 \strokec2 \
+            v_unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2  v_units_per_slot\cf4 \strokec4 ,\cf2 \strokec2  v_sessions_detail\
+        \cf7 \strokec7 FROM\cf2 \strokec2  get_course_price_for_period\cf4 \strokec4 (\cf2 \strokec2 NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2  next_month_start\cf4 \strokec4 ,\cf2 \strokec2  next_month_end\cf4 \strokec4 );\cf2 \strokec2 \
 \
+        \cf5 \strokec5 -- F\'e4lligkeitsdatum berechnen\cf2 \strokec2 \
+        v_t_minus_7 :\cf6 \strokec6 =\cf2 \strokec2  next_month_start \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '7 days'\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Standard: 7 Tage vor Monatsbeginn\cf2 \strokec2 \
+        v_t_minus_2 :\cf6 \strokec6 =\cf2 \strokec2  next_month_start \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '2 days'\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Kurzfristig: 2 Tage vor Monatsbeginn\cf2 \strokec2 \
+\
+        IF CURRENT_DATE \cf6 \strokec6 <\cf2 \strokec2  v_t_minus_7 \cf7 \strokec7 THEN\cf2 \strokec2 \
+            \cf5 \strokec5 -- Standardfall: Mehr als 7 Tage Zeit bis Monatsbeginn\cf2 \strokec2 \
+            v_due_date :\cf6 \strokec6 =\cf2 \strokec2  v_t_minus_7\cf4 \strokec4 ;\cf2 \strokec2 \
+        ELSIF CURRENT_DATE \cf6 \strokec6 <=\cf2 \strokec2  v_t_minus_2 \cf7 \strokec7 THEN\cf2 \strokec2 \
+            \cf5 \strokec5 -- Kurzfristiger Fall: Zwischen 7 und 2 Tagen vor Monatsbeginn\cf2 \strokec2 \
+            v_due_date :\cf6 \strokec6 =\cf2 \strokec2  v_t_minus_2\cf4 \strokec4 ;\cf2 \strokec2 \
+        \cf7 \strokec7 ELSE\cf2 \strokec2 \
+            \cf5 \strokec5 -- Sehr kurzfristiger Fall: Weniger als 2 Tage vor Monatsbeginn\cf2 \strokec2 \
+            v_due_date :\cf6 \strokec6 =\cf2 \strokec2  CURRENT_DATE \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '2 days'\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- F\'e4llig in 2 Tagen\cf2 \strokec2 \
+        \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+        \cf5 \strokec5 -- Enrollment erstellen (Status 'pending')\cf2 \strokec2 \
+        INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments \cf4 \strokec4 (\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  course_id\cf4 \strokec4 ,\cf2 \strokec2  registration_id\cf4 \strokec4 ,\cf2 \strokec2  status\cf4 \strokec4 ,\cf2 \strokec2  enrollment_date\cf4 \strokec4 )\cf2 \strokec2 \
+        VALUES \cf4 \strokec4 (\cf2 \strokec2 NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2  NOW\cf4 \strokec4 ())\cf2 \strokec2  \cf5 \strokec5 -- enrollment_date hier setzen\cf2 \strokec2 \
+        \cf7 \strokec7 RETURNING\cf2 \strokec2  id \cf7 \strokec7 INTO\cf2 \strokec2  new_enrollment_id\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+        \cf5 \strokec5 -- Erste Invoice erstellen und mit Enrollment verkn\'fcpfen\cf2 \strokec2 \
         INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices \cf4 \strokec4 (\cf2 \strokec2 \
             user_id\cf4 \strokec4 ,\cf2 \strokec2 \
             course_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            enrollment_id\cf4 \strokec4 ,\cf2 \strokec2 \
+            enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Verkn\'fcpfung zum neuen Enrollment\cf2 \strokec2 \
             amount\cf4 \strokec4 ,\cf2 \strokec2 \
             units_count\cf4 \strokec4 ,\cf2 \strokec2 \
             price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
             description\cf4 \strokec4 ,\cf2 \strokec2 \
             unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
             units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
-            sessions_detail\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- <--- KORREKT\cf2 \strokec2 \
+            sessions_detail\cf4 \strokec4 ,\cf2 \strokec2 \
             status\cf4 \strokec4 ,\cf2 \strokec2 \
             billing_period_start\cf4 \strokec4 ,\cf2 \strokec2 \
             billing_period_end\cf4 \strokec4 ,\cf2 \strokec2 \
-            due_date\
+            due_date \cf5 \strokec5 -- Berechnetes F\'e4lligkeitsdatum\cf2 \strokec2 \
         \cf4 \strokec4 )\cf2 \strokec2 \
         VALUES \cf4 \strokec4 (\cf2 \strokec2 \
             NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2 \
             NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            \cf6 \strokec6 NULL\cf4 \strokec4 ,\cf2 \strokec2 \
+            new_enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- ID des gerade erstellten Enrollments\cf2 \strokec2 \
             v_total_price\cf4 \strokec4 ,\cf2 \strokec2 \
             v_units_count\cf4 \strokec4 ,\cf2 \strokec2 \
             v_price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
             v_description\cf4 \strokec4 ,\cf2 \strokec2 \
             v_unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
-            v_units_per_slot\cf4 \strokec4 ,\cf2 \strokec2  \
-            v_sessions_detail\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- <--- KORREKT\cf2 \strokec2 \
-            \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2 \
+            v_units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
+            v_sessions_detail\cf4 \strokec4 ,\cf2 \strokec2 \
+            \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Status der Rechnung ist 'pending'\cf2 \strokec2 \
             next_month_start\cf4 \strokec4 ,\cf2 \strokec2 \
             next_month_end\cf4 \strokec4 ,\cf2 \strokec2 \
-            CURRENT_DATE \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '14 days'\cf2 \strokec2 \
+            v_due_date \cf5 \strokec5 -- Das berechnete F\'e4lligkeitsdatum\cf2 \strokec2 \
         \cf4 \strokec4 )\cf2 \strokec2 \
         \cf7 \strokec7 RETURNING\cf2 \strokec2  id \cf7 \strokec7 INTO\cf2 \strokec2  new_invoice_id\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-        \cf5 \strokec5 -- E-Mail-Log (die korrekte Version)\cf2 \strokec2 \
+        \cf5 \strokec5 -- E-Mail-Log f\'fcr die Rechnungs-E-Mail erstellen\cf2 \strokec2 \
         INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 email_logs \cf4 \strokec4 (\cf2 \strokec2 \
-            user_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            registration_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            email_type\cf4 \strokec4 ,\cf2 \strokec2 \
-            recipient_email\cf4 \strokec4 ,\cf2 \strokec2 \
-            subject\cf4 \strokec4 ,\cf2 \strokec2 \
-            status\cf4 \strokec4 ,\cf2 \strokec2 \
-            metadata\
+            user_id\cf4 \strokec4 ,\cf2 \strokec2  registration_id\cf4 \strokec4 ,\cf2 \strokec2  email_type\cf4 \strokec4 ,\cf2 \strokec2  recipient_email\cf4 \strokec4 ,\cf2 \strokec2  subject\cf4 \strokec4 ,\cf2 \strokec2  status\cf4 \strokec4 ,\cf2 \strokec2  metadata\
         \cf4 \strokec4 )\cf2 \strokec2 \
         VALUES \cf4 \strokec4 (\cf2 \strokec2 \
-            NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2 \
-            NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2 \
-            \cf8 \strokec8 'invoice'\cf4 \strokec4 ,\cf2 \strokec2 \
-            user_email\cf4 \strokec4 ,\cf2 \strokec2 \
+            NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'invoice'\cf4 \strokec4 ,\cf2 \strokec2  user_email\cf4 \strokec4 ,\cf2 \strokec2 \
+            \cf5 \strokec5 -- Betreff anpassen, falls von Warteliste\cf2 \strokec2 \
             \cf7 \strokec7 CASE\cf2 \strokec2 \
-                \cf7 \strokec7 WHEN\cf2 \strokec2  was_on_waitlist \cf7 \strokec7 THEN\cf2 \strokec2  \cf8 \strokec8 'Platz verf\'fcgbar - Ihre Rechnung f\'fcr '\cf2 \strokec2  \cf6 \strokec6 ||\cf2 \strokec2  course_name\
+                \cf7 \strokec7 WHEN\cf2 \strokec2  was_on_waitlist \cf7 \strokec7 THEN\cf2 \strokec2  \cf8 \strokec8 'Wichtig: Platz verf\'fcgbar! Ihre Rechnung f\'fcr '\cf2 \strokec2  \cf6 \strokec6 ||\cf2 \strokec2  course_name \cf6 \strokec6 ||\cf2 \strokec2  \cf8 \strokec8 ' - Zahlung dringend erforderlich!'\cf2 \strokec2 \
                 \cf7 \strokec7 ELSE\cf2 \strokec2  \cf8 \strokec8 'Ihre Rechnung f\'fcr den Kurs '\cf2 \strokec2  \cf6 \strokec6 ||\cf2 \strokec2  course_name\
             \cf7 \strokec7 END\cf4 \strokec4 ,\cf2 \strokec2 \
             \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2 \
             JSONB_BUILD_OBJECT\cf4 \strokec4 (\cf2 \strokec2 \
                 \cf8 \strokec8 'invoice_id'\cf4 \strokec4 ,\cf2 \strokec2  new_invoice_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'enrollment_id'\cf4 \strokec4 ,\cf2 \strokec2  new_enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- ID des Enrollments mitsenden\cf2 \strokec2 \
                 \cf8 \strokec8 'course_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
                 \cf8 \strokec8 'registration_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2 \
-                \cf8 \strokec8 'from_waitlist'\cf4 \strokec4 ,\cf2 \strokec2  was_on_waitlist\
+                \cf8 \strokec8 'from_waitlist'\cf4 \strokec4 ,\cf2 \strokec2  was_on_waitlist\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'urgent_payment_required'\cf4 \strokec4 ,\cf2 \strokec2  was_on_waitlist \cf5 \strokec5 -- Hinweis f\'fcr E-Mail-Template\cf2 \strokec2 \
             \cf4 \strokec4 )\cf2 \strokec2 \
         \cf4 \strokec4 );\cf2 \strokec2 \
 \
-    \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+    \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Ende IF status wechselt auf 'confirmed'\cf2 \strokec2 \
 \
-    RETURN NEW\cf4 \strokec4 ;\cf2 \strokec2 \
+    RETURN NEW\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Wichtig f\'fcr Trigger-Funktionen\cf2 \strokec2 \
 \cf7 \strokec7 END\cf4 \strokec4 ;\cf2 \strokec2 \
 \
 }

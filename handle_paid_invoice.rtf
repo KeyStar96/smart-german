@@ -12,57 +12,46 @@
 
 \f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
 \outl0\strokewidth0 \strokec2 DECLARE\
-    new_enrollment_id UUID\cf4 \strokec4 ;\cf2 \strokec2 \
-    registration_id_var UUID\cf4 \strokec4 ;\cf2 \strokec2 \
-    course_id_var UUID\cf4 \strokec4 ;\cf2 \strokec2 \
+    registration_id_var UUID\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Wird ben\'f6tigt f\'fcr E-Mail-Log\cf2 \strokec2 \
+    course_id_var UUID\cf4 \strokec4 ;\cf2 \strokec2        \cf5 \strokec5 -- Wird ben\'f6tigt f\'fcr Kurs-Update\cf2 \strokec2 \
 BEGIN\
-    \cf5 \strokec5 -- Nur ausf\'fchren, wenn der Status von etwas anderem auf 'paid' wechselt\cf2 \strokec2 \
+    \cf5 \strokec5 -- Nur ausf\'fchren, wenn Status von etwas anderem auf 'paid' wechselt\cf2 \strokec2 \
     IF OLD\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 IS\cf2 \strokec2  \cf7 \strokec7 DISTINCT\cf2 \strokec2  \cf7 \strokec7 FROM\cf2 \strokec2  \cf8 \strokec8 'paid'\cf2 \strokec2  \cf6 \strokec6 AND\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'paid'\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
-        \
-        \cf5 \strokec5 -- WICHTIG: paid_date automatisch setzen, falls nicht bereits gesetzt\cf2 \strokec2 \
+\
+        \cf5 \strokec5 -- Sicherstellen, dass paid_date gesetzt ist\cf2 \strokec2 \
         IF NEW\cf4 \strokec4 .\cf2 \strokec2 paid_date \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
             NEW\cf4 \strokec4 .\cf2 \strokec2 paid_date :\cf6 \strokec6 =\cf2 \strokec2  CURRENT_DATE\cf4 \strokec4 ;\cf2 \strokec2 \
         \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
-        \
-        \cf5 \strokec5 -- Pr\'fcfe ob bereits ein Enrollment existiert\cf2 \strokec2 \
-        IF NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
-            \
-            \cf5 \strokec5 -- Hole die registration_id und course_id aus metadata oder \'fcber user_id\cf2 \strokec2 \
-            \cf5 \strokec5 -- Zuerst versuchen wir es \'fcber email_logs metadata\cf2 \strokec2 \
-            \cf7 \strokec7 SELECT\cf2 \strokec2  metadata\cf6 \strokec6 ->>\cf8 \strokec8 'registration_id'\cf4 \strokec4 ,\cf2 \strokec2  metadata\cf6 \strokec6 ->>\cf8 \strokec8 'course_id'\cf2 \strokec2 \
-            \cf7 \strokec7 INTO\cf2 \strokec2  registration_id_var\cf4 \strokec4 ,\cf2 \strokec2  course_id_var\
-            \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 email_logs\
-            \cf7 \strokec7 WHERE\cf2 \strokec2  email_type \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'invoice'\cf2 \strokec2 \
-            \cf6 \strokec6 AND\cf2 \strokec2  metadata\cf6 \strokec6 ->>\cf8 \strokec8 'invoice_id'\cf2 \strokec2  \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id::text\
-            \cf7 \strokec7 LIMIT\cf2 \strokec2  \cf9 \strokec9 1\cf4 \strokec4 ;\cf2 \strokec2 \
-            \
-            \cf5 \strokec5 -- Falls nicht gefunden, \'fcber registrations Tabelle\cf2 \strokec2 \
-            IF course_id_var \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
-                \cf7 \strokec7 SELECT\cf2 \strokec2  id\cf4 \strokec4 ,\cf2 \strokec2  course_id \
-                \cf7 \strokec7 INTO\cf2 \strokec2  registration_id_var\cf4 \strokec4 ,\cf2 \strokec2  course_id_var\
-                \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 registrations\
-                \cf7 \strokec7 WHERE\cf2 \strokec2  user_id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\
-                \cf6 \strokec6 AND\cf2 \strokec2  status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'confirmed'\cf2 \strokec2 \
-                \cf7 \strokec7 ORDER\cf2 \strokec2  BY created_at \cf7 \strokec7 DESC\cf2 \strokec2 \
-                \cf7 \strokec7 LIMIT\cf2 \strokec2  \cf9 \strokec9 1\cf4 \strokec4 ;\cf2 \strokec2 \
-            \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
-            \
-            \cf5 \strokec5 -- Enrollment erstellen\cf2 \strokec2 \
+\
+        \cf5 \strokec5 -- \'dcberpr\'fcfen, ob eine Enrollment-ID vorhanden ist\cf2 \strokec2 \
+        IF NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NOT\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
+            \cf5 \strokec5 -- Bestehendes Enrollment finden und Status auf 'active' setzen\cf2 \strokec2 \
+            \cf5 \strokec5 -- enrollment_date wurde bereits in handle_confirmed_registration gesetzt\cf2 \strokec2 \
+            UPDATE public\cf4 \strokec4 .\cf2 \strokec2 enrollments\
+            SET status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'active'\cf4 \strokec4 ,\cf2 \strokec2 \
+                updated_at \cf6 \strokec6 =\cf2 \strokec2  NOW\cf4 \strokec4 ()\cf2 \strokec2 \
+            \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\
+              \cf6 \strokec6 AND\cf2 \strokec2  status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'pending'\cf2 \strokec2  \cf5 \strokec5 -- Nur updaten, wenn es noch 'pending' war\cf2 \strokec2 \
+            \cf7 \strokec7 RETURNING\cf2 \strokec2  course_id\cf4 \strokec4 ,\cf2 \strokec2  registration_id \cf7 \strokec7 INTO\cf2 \strokec2  course_id_var\cf4 \strokec4 ,\cf2 \strokec2  registration_id_var\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- IDs f\'fcr sp\'e4tere Schritte holen\cf2 \strokec2 \
+\
+            \cf5 \strokec5 -- Pr\'fcfen, ob das Update erfolgreich war (ROW_COUNT > 0 implizit durch RETURNING)\cf2 \strokec2 \
             IF course_id_var \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NOT\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
-                INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments \cf4 \strokec4 (\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  course_id\cf4 \strokec4 ,\cf2 \strokec2  registration_id\cf4 \strokec4 ,\cf2 \strokec2  status\cf4 \strokec4 )\cf2 \strokec2 \
-                VALUES \cf4 \strokec4 (\cf2 \strokec2 NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  course_id_var\cf4 \strokec4 ,\cf2 \strokec2  registration_id_var\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'active'\cf4 \strokec4 )\cf2 \strokec2 \
-                \cf7 \strokec7 RETURNING\cf2 \strokec2  id \cf7 \strokec7 INTO\cf2 \strokec2  new_enrollment_id\cf4 \strokec4 ;\cf2 \strokec2 \
-                \
-                \cf5 \strokec5 -- Invoice mit enrollment_id updaten\cf2 \strokec2 \
-                NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id :\cf6 \strokec6 =\cf2 \strokec2  new_enrollment_id\cf4 \strokec4 ;\cf2 \strokec2 \
-                \
-                \cf5 \strokec5 -- Teilnehmerzahl im Kurs erh\'f6hen\cf2 \strokec2 \
-                UPDATE public\cf4 \strokec4 .\cf2 \strokec2 courses \
-                SET current_participants \cf6 \strokec6 =\cf2 \strokec2  current_participants \cf6 \strokec6 +\cf2 \strokec2  \cf9 \strokec9 1\cf2 \strokec2  \
-                \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  course_id_var\cf4 \strokec4 ;\cf2 \strokec2 \
+                 \cf5 \strokec5 -- Teilnehmerzahl im Kurs erh\'f6hen\cf2 \strokec2 \
+                 UPDATE public\cf4 \strokec4 .\cf2 \strokec2 courses\
+                 SET current_participants \cf6 \strokec6 =\cf2 \strokec2  current_participants \cf6 \strokec6 +\cf2 \strokec2  \cf9 \strokec9 1\cf2 \strokec2 \
+                 \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  course_id_var\cf4 \strokec4 ;\cf2 \strokec2 \
+            \cf7 \strokec7 ELSE\cf2 \strokec2 \
+                 \cf5 \strokec5 -- Warnung, falls Enrollment nicht gefunden oder bereits 'active' war\cf2 \strokec2 \
+                 RAISE WARNING \cf8 \strokec8 '[handle_paid_invoice] Enrollment ID % f\'fcr Invoice ID % konnte nicht auf active gesetzt werden (ggf. bereits active oder nicht gefunden). Kurs-Teilnehmerzahl nicht erh\'f6ht.'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ;\cf2 \strokec2 \
+                 \cf5 \strokec5 -- Versuche trotzdem, die registration_id zu holen, falls sie f\'fcr die E-Mail gebraucht wird\cf2 \strokec2 \
+                 \cf7 \strokec7 SELECT\cf2 \strokec2  registration_id \cf7 \strokec7 INTO\cf2 \strokec2  registration_id_var \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 ;\cf2 \strokec2 \
             \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+        \cf7 \strokec7 ELSE\cf2 \strokec2 \
+             \cf5 \strokec5 -- Warnung, falls Rechnung bezahlt wurde, aber keine enrollment_id hat (sollte nicht passieren mit neuem Workflow)\cf2 \strokec2 \
+             RAISE WARNING \cf8 \strokec8 '[handle_paid_invoice] Invoice ID % wurde als bezahlt markiert, hat aber keine zugeh\'f6rige enrollment_id.'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ;\cf2 \strokec2 \
         \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
-        \
+\
         \cf5 \strokec5 -- E-Mail-Log f\'fcr Zahlungsbest\'e4tigung erstellen\cf2 \strokec2 \
         INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 email_logs \cf4 \strokec4 (\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  email_type\cf4 \strokec4 ,\cf2 \strokec2  recipient_email\cf4 \strokec4 ,\cf2 \strokec2  subject\cf4 \strokec4 ,\cf2 \strokec2  status\cf4 \strokec4 ,\cf2 \strokec2  metadata\cf4 \strokec4 )\cf2 \strokec2 \
         \cf7 \strokec7 SELECT\cf2 \strokec2 \
@@ -71,14 +60,18 @@ BEGIN\
             u\cf4 \strokec4 .\cf2 \strokec2 email\cf4 \strokec4 ,\cf2 \strokec2 \
             \cf8 \strokec8 'Zahlungsbest\'e4tigung f\'fcr Ihren SmartGerman Kurs'\cf4 \strokec4 ,\cf2 \strokec2 \
             \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2 \
-            jsonb_build_object\cf4 \strokec4 (\cf8 \strokec8 'invoice_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'enrollment_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 )\cf2 \strokec2 \
+            jsonb_build_object\cf4 \strokec4 (\cf2 \strokec2 \
+                \cf8 \strokec8 'invoice_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'enrollment_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'registration_id'\cf4 \strokec4 ,\cf2 \strokec2  registration_id_var \cf5 \strokec5 -- registration_id aus dem Enrollment\cf2 \strokec2 \
+            \cf4 \strokec4 )\cf2 \strokec2 \
         \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices i\
         \cf6 \strokec6 JOIN\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 users u \cf7 \strokec7 ON\cf2 \strokec2  i\cf4 \strokec4 .\cf2 \strokec2 user_id \cf6 \strokec6 =\cf2 \strokec2  u\cf4 \strokec4 .\cf2 \strokec2 id\
         \cf7 \strokec7 WHERE\cf2 \strokec2  i\cf4 \strokec4 .\cf2 \strokec2 id \cf6 \strokec6 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ;\cf2 \strokec2 \
-        \
-    \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
-    \
-    RETURN NEW\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Ende IF status wechselt auf 'paid'\cf2 \strokec2 \
+\
+    RETURN NEW\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Wichtig f\'fcr Trigger-Funktionen (besonders BEFORE Trigger, damit \'c4nderungen an NEW \'fcbernommen werden)\cf2 \strokec2 \
 \cf7 \strokec7 END\cf4 \strokec4 ;\cf2 \strokec2 \
 \
 }
