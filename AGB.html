@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGB - SmartGerman</title>
+    <meta name="description" content="Allgemeine Geschäftsbedingungen (AGB) der SmartGerman Sprachschule in Hannover">
+    <meta name="robots" content="noindex, follow">
+    
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <style>
+        /* Grundlegende Styles aus der Hauptseite übernehmen */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #1d1d1f;
+            background-color: #f5f5f7;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: saturate(180%) blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 44px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+        
+        .logo {
+            height: 36px;
+        }
+        
+        .privacy-policy-page {
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 36px;
+            line-height: 1.1;
+            font-weight: 600;
+            letter-spacing: -0.002em;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            line-height: 1.2;
+            font-weight: 600;
+            margin: 40px 0 20px;
+        }
+        
+        p, ul, ol {
+            font-size: 17px;
+            line-height: 1.47;
+            letter-spacing: -0.022em;
+            margin-bottom: 20px;
+        }
+        
+        ul, ol {
+            padding-left: 30px;
+        }
+        
+        a {
+            color: #0071e3;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 22px;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .back-button:hover {
+            background-color: #e8e8ed;
+            text-decoration: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #86868b;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sprach-Umschalter Styles */
+        .language-selector {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .language-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 980px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .language-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .language-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #1d1d1f;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .language-option:hover {
+            background-color: #f5f5f7;
+        }
+
+        .language-option.active {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .flag-icon {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="SmartGerman.html">
+                <img src="/Users/denniskostjuk/Documents/Business/Logo/SmartGerman-bg-remove.png" alt="SmartGerman Logo" class="logo">
+            </a>
+            
+            <div class="language-selector">
+                <button id="languageBtn" class="language-toggle" onclick="toggleLanguageDropdown()" title="Sprache wechseln">
+                    <span class="flag-icon">🇩🇪</span>
+                    <span class="lang-text">DE</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div id="languageDropdown" class="language-dropdown">
+                    <a href="#" onclick="changeLanguage('de'); return false;" class="language-option active" data-lang="de">
+                        <span class="flag-icon">🇩🇪</span>
+                        <span>Deutsch</span>
+                    </a>
+                    <a href="#" onclick="changeLanguage('en'); return false;" class="language-option" data-lang="en">
+                        <span class="flag-icon">🇬🇧</span>
+                        <span>English</span>
+                    </a>
+                    <a href="#" onclick="changeLanguage('ru'); return false;" class="language-option" data-lang="ru">
+                        <span class="flag-icon">🇷🇺</span>
+                        <span>Русский</span>
+                    </a>
+                    <a href="#" onclick="changeLanguage('ua'); return false;" class="language-option" data-lang="ua">
+                        <span class="flag-icon">🇺🇦</span>
+                        <span>Українська</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="privacy-policy-page">
+        <h1 data-i18n="agb_title">Allgemeine Geschäftsbedingungen (AGB)</h1>
+        <p data-i18n="agb_updated">Stand: Oktober 2025</p>
+        
+        <h2 data-i18n="agb_s1_title">§ 1 Geltungsbereich, Anbieter</h2>
+        <p data-i18n="agb_s1_text1">(1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für sämtliche Verträge über die Teilnahme an Sprachkursen, Sprachtrainings, Einzelunterricht, Online-Kursen und sonstigen Leistungen der SmartGerman Sprachschule (nachfolgend „Sprachschule").</p>
+        <p>
+            <strong data-i18n="privacy_company_name">SmartGerman Sprachschule</strong><br>
+            Hüttenstraße 24a, 30165 Hannover, Deutschland<br>
+            E-Mail: info@smart-german.com | Tel: [Telefonnummer einfügen]
+        </p>
+        <p data-i18n="agb_s1_text2">(2) Abweichende oder ergänzende Bedingungen des Teilnehmers werden nur verbindlich, wenn die Sprachschule dies schriftlich bestätigt.</p>
+
+        <h2 data-i18n="agb_s2_title">§ 2 Vertragsgegenstand</h2>
+        <p data-i18n="agb_s2_text1">(1) Vertragsgegenstand sind die in der Kursbeschreibung auf der Webseite angegebenen Leistungen (Leistungsumfang, Kursdauer, Termine, Lehrmaterialien). Die Kursbeschreibung ist Vertragsbestandteil.</p>
+        <p data-i18n="agb_s2_text2">(2) Geringfügige Änderungen im Kursablauf, bei Dozent:innen oder Unterrichtszeiten sind zulässig, sofern der Gesamtcharakter des Kurses nicht wesentlich beeinträchtigt wird.</p>
+
+        <h2 data-i18n="agb_s3_title">§ 3 Anmeldung und Vertragsschluss</h2>
+        <p data-i18n="agb_s3_text1">(1) Die Anmeldung kann online über die Webseite, per E-Mail oder persönlich erfolgen. Die Anmeldung stellt ein verbindliches Angebot des Teilnehmers dar.</p>
+        <p data-i18n="agb_s3_text2">(2) Der Vertrag kommt zustande, sobald die Sprachschule die Anmeldung schriftlich (z. B. per E-Mail) bestätigt oder die Kursgebühr entrichtet wurde. Die in Erfüllung gesetzlicher Informationspflichten erforderlichen Angaben werden dem Teilnehmer vor Vertragsschluss zur Verfügung gestellt.</p>
+
+        <h2 data-i18n="agb_s4_title">§ 4 Preise, Zahlungsbedingungen, Verzug</h2>
+        <p data-i18n="agb_s4_text1">(1) Die jeweils gültigen Preise ergeben sich aus der auf der Webseite veröffentlichten Preisübersicht. Alle Preise verstehen sich inklusive der gesetzlichen Umsatzsteuer, sofern anwendbar.</p>
+        <p data-i18n="agb_s4_text2">(2) Bei monatlich abgerechneten Kursen ist die Gebühr im Voraus für den kommenden Abrechnungsmonat fällig, sofern nicht anders vereinbart. Leistungsbeginn kann nur erfolgen, wenn etwaige Vorauszahlungen geleistet sind.</p>
+        <p data-i18n="agb_s4_text3">(3) Gerät der Teilnehmer in Zahlungsverzug, gelten die gesetzlichen Verzugsregelungen. Der Verzugszinssatz beträgt für Verbraucher 5 Prozentpunkte über dem Basiszinssatz; bei Unternehmern 9 Prozentpunkte über dem Basiszinssatz. Weitergehende Ansprüche wegen Mahn- und Rückbuchungskosten bleiben vorbehalten.</p>
+
+        <h2 data-i18n="agb_s5_title">§ 5 Widerrufsrecht (Verbraucher / Fernabsatzverträge)</h2>
+        <p data-i18n="agb_s5_text1">(1) Sofern ein Widerrufsrecht besteht, wird der Teilnehmer in der gesonderten Widerrufsbelehrung informiert. Bei außerhalb von Geschäftsräumen oder im Fernabsatz geschlossenen Dienstleistungsverträgen besteht grundsätzlich ein 14-tägiges Widerrufsrecht. Dieses kann unter den gesetzlichen Voraussetzungen vorzeitig erlöschen (z. B. bei vollständiger Leistungserbringung mit ausdrücklicher Zustimmung des Verbrauchers und vorheriger Belehrung). Fehlt eine ordnungsgemäße Widerrufsbelehrung, kann sich das Widerrufsrecht verlängern. Details regelt das Gesetz.</p>
+
+        <h2 data-i18n="agb_s6_title">§ 6 Nichtteilnahme / Nachholtermine</h2>
+        <p data-i18n="agb_s6_text1">(1) Die Kursgebühr deckt die Teilnahme am gebuchten Kurs im jeweiligen Abrechnungszeitraum ab. Bei Nichtteilnahme an einzelnen Unterrichtseinheiten (z. B. Krankheit, Urlaub) besteht kein Anspruch auf anteilige Erstattung, es sei denn, dies wurde ausdrücklich und schriftlich vereinbart.</p>
+        <p data-i18n="agb_s6_text2">(2) Nachholtermine werden nur auf ausdrücklichen schriftlichen Wunsch und nach Verfügbarkeit angeboten; ein Anspruch besteht nicht, außer bei anderslautender vertraglicher Zusage.</p>
+
+        <h2 data-i18n="agb_s7_title">§ 7 Ausfall durch die Sprachschule / Ersatzleistungen</h2>
+        <p data-i18n="agb_s7_text1">(1) Fällt eine Unterrichtseinheit aus, weil die Sprachschule dies zu vertreten hat (z. B. Erkrankung Dozent/in) und kein adäquater Ersatz gestellt werden kann, wird die anteilige Kursgebühr erstattet oder ein Ersatztermin angeboten.</p>
+        <p data-i18n="agb_s7_text2">(2) Weitergehende Ansprüche, insbesondere Schadensersatz wegen Nichterfüllung, sind ausgeschlossen, soweit nicht Vorsatz oder grobe Fahrlässigkeit vorliegen.</p>
+
+        <h2 data-i18n="agb_s8_title">§ 8 Haftung</h2>
+        <p data-i18n="agb_s8_text1">(1) Die Sprachschule haftet für Schäden nur bei Vorsatz und grober Fahrlässigkeit; bei einfacher Fahrlässigkeit nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten) und beschränkt auf den vertragstypischen, vorhersehbaren Schaden. Für Schäden aus Verletzung des Lebens, des Körpers oder der Gesundheit gelten gesetzliche Regelungen unbeschränkt. Diese Haftungsregelung gilt nicht, soweit eine Garantie übernommen wurde oder zwingende gesetzliche Bestimmungen entgegenstehen.</p>
+        <p data-i18n="agb_s8_text2">(2) Die Sprachschule übernimmt keine Garantie für einen bestimmten Lernerfolg.</p>
+        <p data-i18n="agb_s8_text3">(3) Die Sprachschule haftet nicht für Diebstahl oder Beschädigung persönlicher Gegenstände, außer bei Vorsatz oder grober Fahrlässigkeit.</p>
+
+        <h2 data-i18n="agb_s9_title">§ 9 Urheberrecht / Kursmaterialien</h2>
+        <p data-i18n="agb_s9_text1">(1) Kursunterlagen sind urheberrechtlich geschützt und dürfen nur für den persönlichen Gebrauch des Teilnehmers verwendet werden. Vervielfältigung, Weitergabe oder Veröffentlichung bedarf der schriftlichen Zustimmung der Sprachschule.</p>
+
+        <h2 data-i18n="agb_s10_title">§ 10 Laufzeit, Kündigung, automatische Verlängerung</h2>
+        <p data-i18n="agb_s10_text1">(1) Bei Kursen mit Mindestlaufzeit endet das Vertragsverhältnis automatisch zum Ablauf, sofern nicht eine Kündigung durch eine Partei mit der vereinbarten Kündigungsfrist erfolgt. Kündigungsfristen nach Ablauf einer Mindestlaufzeit werden im Vertrag angegeben; für Verbraucherverträge sind gesetzliche Beschränkungen zu beachten.</p>
+
+        <h2 data-i18n="agb_s11_title">§ 11 Datenschutz</h2>
+        <p data-i18n="agb_s11_text1">(1) Die Erhebung, Verarbeitung und Nutzung personenbezogener Daten erfolgt nach den geltenden Datenschutzgesetzen (DSGVO, BDSG). Nähere Informationen enthält die <a href="Datenschutz.html">Datenschutzerklärung</a> auf der Webseite.</p>
+
+        <h2 data-i18n="agb_s12_title">§ 12 Schlussbestimmungen</h2>
+        <p data-i18n="agb_s12_text1">(1) Es gilt deutsches Recht.</p>
+        <p data-i18n="agb_s12_text2">(2) Sofern der Teilnehmer Verbraucher ist, gilt der gesetzliche Gerichtsstand des Wohnsitzes des Verbrauchers vorrangig; abweichende Gerichtsstandsvereinbarungen sind nur insoweit zulässig, wie das Gesetz dies erlaubt.</p>
+        <p data-i18n="agb_s12_text3">(3) Sollten einzelne Bestimmungen dieser AGB unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.</p>
+        
+        <a href="SmartGerman.html" class="back-button" data-i18n="back_to_home">Zurück zur Startseite</a>
+    </div>
+    
+    <footer>
+    </footer>
+
+    <script src="translations.js"></script>
+    <script>
+        // Funktion zum Umschalten des Dropdowns
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Event-Listener, um das Dropdown zu schließen, wenn man außerhalb klickt
+        document.addEventListener('click', function(event) {
+            const selector = document.querySelector('.language-selector');
+            if (selector && !selector.contains(event.target)) {
+                document.getElementById('languageDropdown')?.classList.remove('show');
+            }
+        });
+
+        // Funktion zum Aktualisieren des Sprach-Buttons
+        function updateLanguageButton() {
+            const langBtn = document.getElementById('languageBtn');
+            if (langBtn) {
+                const flags = { 'de': '🇩🇪', 'en': '🇬🇧', 'ru': '🇷🇺', 'ua': '🇺🇦' };
+                const codes = { 'de': 'DE', 'en': 'EN', 'ru': 'RU', 'ua': 'UA' };
+                
+                langBtn.querySelector('.flag-icon').textContent = flags[currentLanguage];
+                langBtn.querySelector('.lang-text').textContent = codes[currentLanguage];
+                
+                document.querySelectorAll('.language-option').forEach(opt => {
+                    opt.classList.toggle('active', opt.dataset.lang === currentLanguage);
+                });
+            }
+        }
+
+        // Überschreibt die `changeLanguage` Funktion, um das Dropdown zu schließen
+        const originalChangeLanguage = window.changeLanguage;
+        window.changeLanguage = function(lang) {
+            originalChangeLanguage(lang);
+            toggleLanguageDropdown();
+        };
+
+        // Initiales Laden der Sprache
+        document.addEventListener('DOMContentLoaded', function() {
+            currentLanguage = localStorage.getItem('smartgerman_language') || 'de';
+            updatePageLanguage();
+            updateLanguageButton();
+        });
+    </script>
+</body>
+</html>
