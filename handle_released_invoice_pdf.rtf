@@ -1,0 +1,67 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red212\green212\blue212;
+\red100\green117\blue135;\red83\green83\blue83;\red70\green137\blue204;\red36\green168\blue107;}
+{\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c86275\c86275\c86275;
+\cssrgb\c46667\c53333\c60000;\cssrgb\c40000\c40000\c40000;\cssrgb\c33725\c61176\c83922;\cssrgb\c14118\c70588\c49412;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 DECLARE\
+    v_user_email TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_course_name TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_recipient_user_id UUID :\cf5 \strokec5 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_invoice_number TEXT :\cf5 \strokec5 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 invoice_number\cf4 \strokec4 ;\cf2 \strokec2 \
+BEGIN\
+    \cf6 \strokec6 -- Nur ausf\'fchren, wenn pdf_status von etwas anderem auf 'released' wechselt\cf2 \strokec2 \
+    IF OLD\cf4 \strokec4 .\cf2 \strokec2 pdf_status \cf5 \strokec5 IS\cf2 \strokec2  \cf7 \strokec7 DISTINCT\cf2 \strokec2  \cf7 \strokec7 FROM\cf2 \strokec2  \cf8 \strokec8 'released'\cf2 \strokec2  \cf5 \strokec5 AND\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 pdf_status \cf5 \strokec5 =\cf2 \strokec2  \cf8 \strokec8 'released'\cf2 \strokec2  \cf7 \strokec7 THEN\cf2 \strokec2 \
+\
+        \cf6 \strokec6 -- User E-Mail und Kursnamen holen\cf2 \strokec2 \
+        \cf7 \strokec7 SELECT\cf2 \strokec2  email \cf7 \strokec7 INTO\cf2 \strokec2  v_user_email \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 users \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf5 \strokec5 =\cf2 \strokec2  v_recipient_user_id\cf4 \strokec4 ;\cf2 \strokec2 \
+        \cf6 \strokec6 -- Kursnamen holen (k\'f6nnte NULL sein, wenn keine course_id an der Rechnung h\'e4ngt)\cf2 \strokec2 \
+        \cf7 \strokec7 SELECT\cf2 \strokec2  name \cf7 \strokec7 INTO\cf2 \strokec2  v_course_name \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 courses \cf7 \strokec7 WHERE\cf2 \strokec2  id \cf5 \strokec5 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+        \cf6 \strokec6 -- E-Mail Log Eintrag erstellen, um den Versand anzusto\'dfen\cf2 \strokec2 \
+        INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 email_logs \cf4 \strokec4 (\cf2 \strokec2 \
+            user_id\cf4 \strokec4 ,\cf2 \strokec2 \
+            registration_id\cf4 \strokec4 ,\cf2 \strokec2  \cf6 \strokec6 -- Versuchen, die registration_id \'fcber das enrollment zu holen\cf2 \strokec2 \
+            email_type\cf4 \strokec4 ,\cf2 \strokec2 \
+            recipient_email\cf4 \strokec4 ,\cf2 \strokec2 \
+            subject\cf4 \strokec4 ,\cf2 \strokec2 \
+            status\cf4 \strokec4 ,\cf2 \strokec2 \
+            metadata\
+        \cf4 \strokec4 )\cf2 \strokec2 \
+        \cf7 \strokec7 SELECT\cf2 \strokec2 \
+            v_recipient_user_id\cf4 \strokec4 ,\cf2 \strokec2 \
+            e\cf4 \strokec4 .\cf2 \strokec2 registration_id\cf4 \strokec4 ,\cf2 \strokec2  \cf6 \strokec6 -- registration_id aus dem verkn\'fcpften Enrollment\cf2 \strokec2 \
+            \cf8 \strokec8 'invoice'\cf4 \strokec4 ,\cf2 \strokec2 \
+            v_user_email\cf4 \strokec4 ,\cf2 \strokec2 \
+            \cf8 \strokec8 'Ihre Rechnung '\cf2 \strokec2  \cf5 \strokec5 ||\cf2 \strokec2  v_invoice_number \cf5 \strokec5 ||\cf2 \strokec2  \cf8 \strokec8 ' f\'fcr '\cf2 \strokec2  \cf5 \strokec5 ||\cf2 \strokec2  COALESCE\cf4 \strokec4 (\cf2 \strokec2 v_course_name\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'Ihren Kurs'\cf4 \strokec4 ),\cf2 \strokec2 \
+            \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2 \
+            jsonb_build_object\cf4 \strokec4 (\cf2 \strokec2 \
+                \cf8 \strokec8 'invoice_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'enrollment_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'course_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'pdf_url'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 pdf_url \cf6 \strokec6 -- PDF URL an Metadaten \'fcbergeben\cf2 \strokec2 \
+            \cf4 \strokec4 )\cf2 \strokec2 \
+        \cf7 \strokec7 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments e \cf6 \strokec6 -- JOIN mit enrollments\cf2 \strokec2 \
+        \cf7 \strokec7 WHERE\cf2 \strokec2  e\cf4 \strokec4 .\cf2 \strokec2 id \cf5 \strokec5 =\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 enrollment_id\cf4 \strokec4 ;\cf2 \strokec2  \cf6 \strokec6 -- Nur wenn ein Enrollment verkn\'fcpft ist\cf2 \strokec2 \
+\
+        \cf6 \strokec6 -- Fallback, falls kein Enrollment verkn\'fcpft ist (sollte nicht passieren, aber sicherheitshalber)\cf2 \strokec2 \
+        IF \cf5 \strokec5 NOT\cf2 \strokec2  FOUND \cf7 \strokec7 THEN\cf2 \strokec2 \
+             INSERT \cf7 \strokec7 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 email_logs \cf4 \strokec4 (\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2  email_type\cf4 \strokec4 ,\cf2 \strokec2  recipient_email\cf4 \strokec4 ,\cf2 \strokec2  subject\cf4 \strokec4 ,\cf2 \strokec2  status\cf4 \strokec4 ,\cf2 \strokec2  metadata\cf4 \strokec4 )\cf2 \strokec2 \
+             VALUES \cf4 \strokec4 (\cf2 \strokec2 \
+                v_recipient_user_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 NULL\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'invoice'\cf4 \strokec4 ,\cf2 \strokec2  v_user_email\cf4 \strokec4 ,\cf2 \strokec2 \
+                \cf8 \strokec8 'Ihre Rechnung '\cf2 \strokec2  \cf5 \strokec5 ||\cf2 \strokec2  v_invoice_number \cf5 \strokec5 ||\cf2 \strokec2  \cf8 \strokec8 ' f\'fcr '\cf2 \strokec2  \cf5 \strokec5 ||\cf2 \strokec2  COALESCE\cf4 \strokec4 (\cf2 \strokec2 v_course_name\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'Ihren Kurs'\cf4 \strokec4 ),\cf2 \strokec2 \
+                \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2  jsonb_build_object\cf4 \strokec4 (\cf8 \strokec8 'invoice_id'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'pdf_url'\cf4 \strokec4 ,\cf2 \strokec2  NEW\cf4 \strokec4 .\cf2 \strokec2 pdf_url\cf4 \strokec4 )\cf2 \strokec2 \
+             \cf4 \strokec4 );\cf2 \strokec2 \
+        \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    \cf7 \strokec7 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+    RETURN NEW\cf4 \strokec4 ;\cf2 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \strokec7 END\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+}

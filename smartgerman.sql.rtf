@@ -84,7 +84,6 @@ CREATE TABLE public.courses (\
   created_at timestamp with time zone DEFAULT now(),\
   updated_at timestamp with time zone DEFAULT now(),\
   price_per_unit numeric DEFAULT 10.00,\
-  unit_duration integer DEFAULT 45,\
   unit_duration_minutes integer NOT NULL DEFAULT 45,\
   CONSTRAINT courses_pkey PRIMARY KEY (id)\
 );\
@@ -145,6 +144,8 @@ CREATE TABLE public.invoices (\
   sessions_detail jsonb,\
   unit_duration_minutes integer,\
   units_per_slot integer,\
+  pdf_status text DEFAULT 'pending_generation'::text CHECK (pdf_status = ANY (ARRAY['pending_generation'::text, 'awaiting_release'::text, 'released'::text, 'failed_generation'::text])),\
+  pdf_url text,\
   CONSTRAINT invoices_pkey PRIMARY KEY (id),\
   CONSTRAINT invoices_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),\
   CONSTRAINT invoices_enrollment_id_fkey FOREIGN KEY (enrollment_id) REFERENCES public.enrollments(id),\

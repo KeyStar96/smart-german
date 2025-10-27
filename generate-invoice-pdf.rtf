@@ -1,0 +1,367 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red70\green137\blue204;\red24\green24\blue24;\red202\green202\blue202;
+\red212\green212\blue212;\red194\green126\blue101;\red83\green83\blue83;\red54\green192\blue160;\red167\green197\blue152;
+\red163\green79\blue131;}
+{\*\expandedcolortbl;;\cssrgb\c33725\c61176\c83922;\cssrgb\c12157\c12157\c12157;\cssrgb\c83137\c83137\c83137;
+\cssrgb\c86275\c86275\c86275;\cssrgb\c80784\c56863\c47059;\cssrgb\c40000\c40000\c40000;\cssrgb\c23922\c78824\c69020;\cssrgb\c70980\c80784\c65882;
+\cssrgb\c70588\c40000\c58431;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 import\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  serve \cf5 \strokec5 \}\cf4 \strokec4  \cf2 \strokec2 from\cf4 \strokec4  \cf6 \strokec6 'https://deno.land/std@0.168.0/http/server.ts'\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 import\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  createClient \cf5 \strokec5 \}\cf4 \strokec4  \cf2 \strokec2 from\cf4 \strokec4  \cf6 \strokec6 'https://esm.sh/@supabase/supabase-js@2'\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 // Define CORS headers directly in the function file\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 const\cf4 \strokec4  corsHeaders \cf5 \strokec5 =\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf6 \strokec6 'Access-Control-Allow-Origin'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 '*'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3   \cf6 \strokec6 'Access-Control-Allow-Headers'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'authorization, x-client-info, apikey, content-type'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3   \cf6 \strokec6 'Access-Control-Allow-Methods'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'POST, OPTIONS'\cf4 \strokec4  \cf7 \strokec7 // Allow POST (for cron) and OPTIONS\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 \};\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 // --- Konfiguration ---\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 const\cf4 \strokec4  \cf8 \strokec8 API2PDF_KEY\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf8 \strokec8 Deno\cf5 \strokec5 .\cf4 \strokec4 env\cf5 \strokec5 .\cf2 \strokec2 get\cf5 \strokec5 (\cf6 \strokec6 'API2PDF_KEY'\cf5 \strokec5 );\cf4 \strokec4  \cf7 \strokec7 // Dein Api2Pdf API Key\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 const\cf4 \strokec4  \cf8 \strokec8 API2PDF_ENDPOINT\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 'https://v2018.api2pdf.com/chrome/html'\cf5 \strokec5 ;\cf4 \strokec4  \cf7 \strokec7 // Oder wkhtmltopdf Endpoint\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 const\cf4 \strokec4  \cf8 \strokec8 STORAGE_BUCKET\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 'invoice-pdfs'\cf5 \strokec5 ;\cf4 \strokec4  \cf7 \strokec7 // Name deines Supabase Storage Buckets\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 // --- HTML Template (vereinfacht, lade es besser aus einer Datei oder Variable) ---\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 const\cf4 \strokec4  \cf8 \strokec8 INVOICE_TEMPLATE_HTML\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 `\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 <!DOCTYPE html>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6 <html lang="de">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6 <head>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6     <meta charset="UTF-8">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6     <title>Rechnung \{\{INVOICE_NUMBER\}\}</title>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6     <style>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         body \{ font-family: sans-serif; line-height: 1.5; color: #333; font-size: 11pt; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .invoice-container \{ max-width: 800px; margin: 30px auto; padding: 40px; background: white; border: 1px solid #eee; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .header \{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #667eea; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .logo \{ max-height: 50px; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .company-details \{ text-align: right; font-size: 9pt; color: #555; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .invoice-details \{ display: flex; justify-content: space-between; margin-bottom: 30px; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .billing-address, .invoice-meta \{ font-size: 10pt; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .billing-address strong \{ display: block; margin-bottom: 5px; font-size: 11pt; color: #000;\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .invoice-meta p \{ margin: 2px 0; text-align: right; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .invoice-meta strong \{ display: inline-block; min-width: 100px; text-align: left;\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         h1 \{ font-size: 24pt; margin-bottom: 5px; color: #182848; text-align: right; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         h2 \{ font-size: 14pt; margin-top: 40px; margin-bottom: 15px; color: #667eea; border-bottom: 1px solid #eee; padding-bottom: 5px; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         table \{ width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 10pt; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         th, td \{ border-bottom: 1px solid #eee; padding: 10px 5px; text-align: left; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         th \{ background-color: #f8f8f8; font-weight: 600; color: #555; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         td.amount, th.amount \{ text-align: right; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .totals \{ margin-top: 30px; float: right; width: 40%; font-size: 11pt; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .totals table \{ width: 100%; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .totals td \{ border: none; padding: 5px 0; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .totals tr.grand-total td \{ font-weight: bold; font-size: 13pt; color: #182848; border-top: 2px solid #667eea; padding-top: 10px;\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .payment-info \{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 10pt; color: #555; clear: both;\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         .footer \{ margin-top: 50px; text-align: center; font-size: 9pt; color: #888; border-top: 1px solid #eee; padding-top: 20px; \}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         /* Add more styles from your website if needed */\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6     </style>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6 </head>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6 <body>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6     <div class="invoice-container">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         <div class="header">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6             <div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <img src="https://chvsjeddwbcvflqsxvkq.supabase.co/storage/v1/object/public/assets/SmartGerman-bg-remove.png" alt="SmartGerman Logo" class="logo">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <p style="font-size: 9pt; color: #555; margin-top: 10px;">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      SmartGerman Sprachschule<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      H\'fcttenstra\'dfe 24a<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      30165 Hannover\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <div class="company-details">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <h1>Rechnung</h1>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  Anastasia Sitov<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  info@smart-german.de<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  0511 12345678<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <div class="invoice-details">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <div class="billing-address">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <strong>Rechnung an:</strong><br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  \{\{USER_FULL_NAME\}\}<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  \{\{USER_ADDRESS_LINE1\}\}<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  \{\{USER_ADDRESS_LINE2\}\}<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  \{\{USER_EMAIL\}\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <div class="invoice-meta">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <p><strong>Rechnungsnr.:</strong> \{\{INVOICE_NUMBER\}\}</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <p><strong>Rechnungsdatum:</strong> \{\{ISSUE_DATE\}\}</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <p><strong>F\'e4llig am:</strong> \{\{DUE_DATE\}\}</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <p><strong>Leistungszeitraum:</strong> \{\{BILLING_PERIOD\}\}</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <h2>Kursdetails</h2>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <thead>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Kurs</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th class="amount">Preis pro Einheit</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th class="amount">Anzahl Einheiten</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th class="amount">Gesamt</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </thead>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <tbody>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td>\{\{COURSE_NAME\}\} (\{\{COURSE_LEVEL\}\})</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td class="amount">\{\{PRICE_PER_UNIT\}\} \'80</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td class="amount">\{\{TOTAL_UNITS\}\}</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td class="amount">\{\{AMOUNT\}\} \'80</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </tbody>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <h2>Detailaufstellung Termine</h2>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <thead>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Datum</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Wochentag</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Uhrzeit</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Einheiten</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <th>Dauer</th>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </thead>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <tbody>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  \{\{SESSIONS_HTML\}\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </tbody>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <div class="totals">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td>Zwischensumme:</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td class="amount">\{\{AMOUNT\}\} \'80</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  <tr class="grand-total">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td>Gesamtbetrag:</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                      <td class="amount">\{\{TOTAL_AMOUNT\}\} \'80</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                  </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </table>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <div class="payment-info">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <p>Bitte \'fcberweisen Sie den Gesamtbetrag bis zum F\'e4lligkeitsdatum unter Angabe der Rechnungsnummer auf folgendes Konto:</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <p><strong>Empf\'e4nger:</strong> Anastasia Sitov<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <strong>IBAN:</strong> DE89 2505 0180 0000 1234 56<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <strong>BIC:</strong> SPKHDE2HXXX<br>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <strong>Verwendungszweck:</strong> \{\{INVOICE_NUMBER\}\}\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              </p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              <p>Vielen Dank!</p>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          <div class="footer">\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6              SmartGerman Sprachschule - H\'fcttenstra\'dfe 24a, 30165 Hannover - info@smart-german.de\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6          </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6      </div>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6  </body>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6  </html>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6 `\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 // Hilfsfunktion zum Formatieren von Daten\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 function\cf4 \strokec4  formatDate\cf5 \strokec5 (\cf4 \strokec4 dateString\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 dateString\cf5 \strokec5 )\cf4 \strokec4  \cf2 \strokec2 return\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Date\cf5 \strokec5 (\cf4 \strokec4 dateString\cf5 \strokec5 ).\cf4 \strokec4 toLocaleDateString\cf5 \strokec5 (\cf6 \strokec6 'de-DE'\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 \}\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 // Hauptfunktion der Edge Function\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 serve\cf5 \strokec5 (\cf2 \strokec2 async\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 req\cf5 \strokec5 )=>\{\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 req\cf5 \strokec5 .\cf4 \strokec4 method \cf5 \strokec5 ===\cf4 \strokec4  \cf6 \strokec6 'OPTIONS'\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Response\cf5 \strokec5 (\cf6 \strokec6 'ok'\cf5 \strokec5 ,\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       headers\cf5 \strokec5 :\cf4 \strokec4  corsHeaders\cb1 \
+\cb3     \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3   \cf7 \strokec7 // Sicherstellen, dass der API Key vorhanden ist\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf8 \strokec8 API2PDF_KEY\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3     console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 'API2PDF_KEY is not set in environment variables.'\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Response\cf5 \strokec5 (\cf8 \strokec8 JSON\cf5 \strokec5 .\cf4 \strokec4 stringify\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3       error\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'Server configuration error: Missing PDF API key.'\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \}),\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       status\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 500\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       headers\cf5 \strokec5 :\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 ...\cf4 \strokec4 corsHeaders\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         \cf6 \strokec6 'Content-Type'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/json'\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3   \cf7 \strokec7 // Admin Client f\'fcr Server-Operationen\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 const\cf4 \strokec4  supabaseAdmin \cf5 \strokec5 =\cf4 \strokec4  createClient\cf5 \strokec5 (\cf8 \strokec8 Deno\cf5 \strokec5 .\cf4 \strokec4 env\cf5 \strokec5 .\cf2 \strokec2 get\cf5 \strokec5 (\cf6 \strokec6 'MY_SUPABASE_URL'\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 ,\cf4 \strokec4  \cf8 \strokec8 Deno\cf5 \strokec5 .\cf4 \strokec4 env\cf5 \strokec5 .\cf2 \strokec2 get\cf5 \strokec5 (\cf6 \strokec6 'MY_SUPABASE_SECRET_KEY'\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3   console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 'Starting PDF generation process...'\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 let\cf4 \strokec4  generatedCount \cf5 \strokec5 =\cf4 \strokec4  \cf9 \strokec9 0\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 let\cf4 \strokec4  errorCount \cf5 \strokec5 =\cf4 \strokec4  \cf9 \strokec9 0\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 try\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 // 1. Rechnungen holen, die generiert werden m\'fcssen\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 const\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  data\cf5 \strokec5 :\cf4 \strokec4  invoicesToProcess\cf5 \strokec5 ,\cf4 \strokec4  error\cf5 \strokec5 :\cf4 \strokec4  fetchError \cf5 \strokec5 \}\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  supabaseAdmin\cf5 \strokec5 .\cf2 \strokec2 from\cf5 \strokec5 (\cf6 \strokec6 'invoices'\cf5 \strokec5 ).\cf4 \strokec4 select\cf5 \strokec5 (\cf6 \strokec6 `\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6         *,\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         users (*),\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6         courses (*)\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6       `\cf5 \strokec5 ).\cf4 \strokec4 eq\cf5 \strokec5 (\cf6 \strokec6 'pdf_status'\cf5 \strokec5 ,\cf4 \strokec4  \cf6 \strokec6 'pending_generation'\cf5 \strokec5 ).\cf4 \strokec4 limit\cf5 \strokec5 (\cf9 \strokec9 10\cf5 \strokec5 );\cf4 \strokec4  \cf7 \strokec7 // Verarbeite in Batches\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 fetchError\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 'Error fetching invoices:'\cf5 \strokec5 ,\cf4 \strokec4  fetchError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `DB Error fetching invoices: \cf5 \strokec5 $\{\cf4 \strokec4 fetchError\cf5 \strokec5 .\cf4 \strokec4 message\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 invoicesToProcess \cf5 \strokec5 ||\cf4 \strokec4  invoicesToProcess\cf5 \strokec5 .\cf4 \strokec4 length \cf5 \strokec5 ===\cf4 \strokec4  \cf9 \strokec9 0\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 'No invoices pending PDF generation.'\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Response\cf5 \strokec5 (\cf8 \strokec8 JSON\cf5 \strokec5 .\cf4 \strokec4 stringify\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3         message\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'No invoices pending PDF generation.'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         generated\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 0\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         errors\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 0\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}),\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         status\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 200\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         headers\cf5 \strokec5 :\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           \cf5 \strokec5 ...\cf4 \strokec4 corsHeaders\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           \cf6 \strokec6 'Content-Type'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/json'\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Found \cf5 \strokec5 $\{\cf4 \strokec4 invoicesToProcess\cf5 \strokec5 .\cf4 \strokec4 length\cf5 \strokec5 \}\cf6 \strokec6  invoices to process.`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 // 2. Jede Rechnung verarbeiten\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 for\cf4 \strokec4  \cf5 \strokec5 (\cf2 \strokec2 const\cf4 \strokec4  invoice \cf2 \strokec2 of\cf4 \strokec4  invoicesToProcess\cf5 \strokec5 )\{\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 const\cf4 \strokec4  invoiceId \cf5 \strokec5 =\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 id\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 const\cf4 \strokec4  userId \cf5 \strokec5 =\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 user_id\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 const\cf4 \strokec4  invoiceNumber \cf5 \strokec5 =\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 invoice_number\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 try\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Processing invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6  (ID: \cf5 \strokec5 $\{\cf4 \strokec4 invoiceId\cf5 \strokec5 \}\cf6 \strokec6 )...`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Sicherstellen, dass User und Kursdaten vorhanden sind\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 )\cf4 \strokec4  \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `User data missing for invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceId\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Kursdaten sind optional, aber gut f\'fcr die Rechnung\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  courseName \cf5 \strokec5 =\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 courses\cf5 \strokec5 ?.\cf4 \strokec4 name \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 'Kurs'\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  courseLevel \cf5 \strokec5 =\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 courses\cf5 \strokec5 ?.\cf4 \strokec4 level \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Sessions HTML generieren\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 let\cf4 \strokec4  sessionsHtmlContent \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 sessions_detail \cf5 \strokec5 &&\cf4 \strokec4  \cf8 \strokec8 Array\cf5 \strokec5 .\cf4 \strokec4 isArray\cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 sessions_detail\cf5 \strokec5 ))\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           invoice\cf5 \strokec5 .\cf4 \strokec4 sessions_detail\cf5 \strokec5 .\cf4 \strokec4 forEach\cf5 \strokec5 ((\cf4 \strokec4 session\cf5 \strokec5 )=>\{\cf4 \cb1 \strokec4 \
+\cb3             sessionsHtmlContent \cf5 \strokec5 +=\cf4 \strokec4  \cf6 \strokec6 `\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6               <tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <td>\cf5 \strokec5 $\{\cf4 \strokec4 session\cf5 \strokec5 .\cf4 \strokec4 date_formatted \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 'N/A'\cf5 \strokec5 \}\cf6 \strokec6 </td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <td>\cf5 \strokec5 $\{\cf4 \strokec4 session\cf5 \strokec5 .\cf4 \strokec4 weekday_name \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 \}\cf6 \strokec6 </td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <td>\cf5 \strokec5 $\{\cf4 \strokec4 session\cf5 \strokec5 .\cf4 \strokec4 time \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 \}\cf6 \strokec6 </td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <td>\cf5 \strokec5 $\{\cf4 \strokec4 session\cf5 \strokec5 .\cf4 \strokec4 units \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 \}\cf6 \strokec6 </td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6                 <td>\cf5 \strokec5 $\{\cf4 \strokec4 session\cf5 \strokec5 .\cf4 \strokec4 duration_minutes \cf5 \strokec5 ||\cf4 \strokec4  session\cf5 \strokec5 .\cf4 \strokec4 units \cf5 \strokec5 *\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 unit_duration_minutes \cf5 \strokec5 ||\cf4 \strokec4  \cf9 \strokec9 45\cf5 \strokec5 )\}\cf6 \strokec6  Min</td>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6               </tr>\cf4 \cb1 \strokec4 \
+\cf6 \cb3 \strokec6             `\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3           \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \strokec4  \cf2 \strokec2 else\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           sessionsHtmlContent \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 '<tr><td colspan="5">Keine detaillierten Termine verf\'fcgbar.</td></tr>'\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Template f\'fcllen\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  populatedHtml \cf5 \strokec5 =\cf4 \strokec4  \cf8 \strokec8 INVOICE_TEMPLATE_HTML\cf5 \strokec5 .\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{INVOICE_NUMBER\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoiceNumber\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{ISSUE_DATE\}\}'\cf5 \strokec5 ,\cf4 \strokec4  formatDate\cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 issue_date\cf5 \strokec5 )).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{DUE_DATE\}\}'\cf5 \strokec5 ,\cf4 \strokec4  formatDate\cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 due_date\cf5 \strokec5 )).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{BILLING_PERIOD\}\}'\cf5 \strokec5 ,\cf4 \strokec4  \cf6 \strokec6 `\cf5 \strokec5 $\{\cf4 \strokec4 formatDate\cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 billing_period_start\cf5 \strokec5 )\}\cf6 \strokec6  - \cf5 \strokec5 $\{\cf4 \strokec4 formatDate\cf5 \strokec5 (\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 billing_period_end\cf5 \strokec5 )\}\cf6 \strokec6 `\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{USER_FULL_NAME\}\}'\cf5 \strokec5 ,\cf4 \strokec4  \cf6 \strokec6 `\cf5 \strokec5 $\{\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 first_name\cf5 \strokec5 \}\cf6 \strokec6  \cf5 \strokec5 $\{\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 last_name\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{USER_ADDRESS_LINE1\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 address \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 )\cf4 \strokec4  \cf7 \strokec7 // Optional\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 .\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{USER_ADDRESS_LINE2\}\}'\cf5 \strokec5 ,\cf4 \strokec4  \cf6 \strokec6 `\cf5 \strokec5 $\{\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 zip_code \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 \}\cf6 \strokec6  \cf5 \strokec5 $\{\cf4 \strokec4 invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 city \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 )\cf4 \strokec4  \cf7 \strokec7 // Optional\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 .\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{USER_EMAIL\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 users\cf5 \strokec5 .\cf4 \strokec4 email\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{COURSE_NAME\}\}'\cf5 \strokec5 ,\cf4 \strokec4  courseName\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{COURSE_LEVEL\}\}'\cf5 \strokec5 ,\cf4 \strokec4  courseLevel\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{PRICE_PER_UNIT\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 price_per_unit\cf5 \strokec5 ?.\cf4 \strokec4 toFixed\cf5 \strokec5 (\cf9 \strokec9 2\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 'N/A'\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{TOTAL_UNITS\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 units_count\cf5 \strokec5 ?.\cf4 \strokec4 toString\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 'N/A'\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf10 \strokec10 /\{\{AMOUNT\}\}/\cf2 \strokec2 g\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 amount\cf5 \strokec5 ?.\cf4 \strokec4 toFixed\cf5 \strokec5 (\cf9 \strokec9 2\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 'N/A'\cf5 \strokec5 )\cf4 \strokec4  \cf7 \strokec7 // Global ersetzen\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 .\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{TOTAL_AMOUNT\}\}'\cf5 \strokec5 ,\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 total_amount\cf5 \strokec5 ?.\cf4 \strokec4 toFixed\cf5 \strokec5 (\cf9 \strokec9 2\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  invoice\cf5 \strokec5 .\cf4 \strokec4 amount\cf5 \strokec5 ?.\cf4 \strokec4 toFixed\cf5 \strokec5 (\cf9 \strokec9 2\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 ??\cf4 \strokec4  \cf6 \strokec6 'N/A'\cf5 \strokec5 ).\cf4 \strokec4 replace\cf5 \strokec5 (\cf6 \strokec6 '\{\{SESSIONS_HTML\}\}'\cf5 \strokec5 ,\cf4 \strokec4  sessionsHtmlContent\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // 3. PDF \'fcber Api2Pdf generieren\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Calling Api2Pdf for invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 ...`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  pdfResponse \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  fetch\cf5 \strokec5 (\cf8 \strokec8 API2PDF_ENDPOINT\cf5 \strokec5 ,\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           method\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'POST'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           headers\cf5 \strokec5 :\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3             \cf6 \strokec6 'Authorization'\cf5 \strokec5 :\cf4 \strokec4  \cf8 \strokec8 API2PDF_KEY\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3             \cf6 \strokec6 'Content-Type'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/json'\cf4 \cb1 \strokec4 \
+\cb3           \cf5 \strokec5 \},\cf4 \cb1 \strokec4 \
+\cb3           body\cf5 \strokec5 :\cf4 \strokec4  \cf8 \strokec8 JSON\cf5 \strokec5 .\cf4 \strokec4 stringify\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3             html\cf5 \strokec5 :\cf4 \strokec4  populatedHtml\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3             inlinePdf\cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 false\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3             fileName\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 `\cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 .pdf`\cf4 \cb1 \strokec4 \
+\cb3           \cf5 \strokec5 \})\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 pdfResponse\cf5 \strokec5 .\cf4 \strokec4 ok\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 const\cf4 \strokec4  errorBody \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  pdfResponse\cf5 \strokec5 .\cf4 \strokec4 text\cf5 \strokec5 ();\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `Api2Pdf Error for \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 : \cf5 \strokec5 $\{\cf4 \strokec4 pdfResponse\cf5 \strokec5 .\cf4 \strokec4 status\cf5 \strokec5 \}\cf6 \strokec6  - \cf5 \strokec5 $\{\cf4 \strokec4 errorBody\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `Api2Pdf failed: \cf5 \strokec5 $\{\cf4 \strokec4 errorBody\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  pdfResult \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  pdfResponse\cf5 \strokec5 .\cf4 \strokec4 json\cf5 \strokec5 ();\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 pdfResult\cf5 \strokec5 .\cf4 \strokec4 success \cf5 \strokec5 ||\cf4 \strokec4  \cf5 \strokec5 !\cf4 \strokec4 pdfResult\cf5 \strokec5 .\cf4 \strokec4 pdf\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `Api2Pdf did not return PDF URL for \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 :`\cf5 \strokec5 ,\cf4 \strokec4  pdfResult\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `Api2Pdf failed to generate PDF: \cf5 \strokec5 $\{\cf4 \strokec4 pdfResult\cf5 \strokec5 .\cf4 \strokec4 message \cf5 \strokec5 ||\cf4 \strokec4  \cf6 \strokec6 'No PDF URL received'\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Api2Pdf gibt URL zur tempor\'e4ren Datei zur\'fcck, wir m\'fcssen sie herunterladen\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Fetching PDF from Api2Pdf URL: \cf5 \strokec5 $\{\cf4 \strokec4 pdfResult\cf5 \strokec5 .\cf4 \strokec4 pdf\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  pdfDownloadResponse \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  fetch\cf5 \strokec5 (\cf4 \strokec4 pdfResult\cf5 \strokec5 .\cf4 \strokec4 pdf\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 pdfDownloadResponse\cf5 \strokec5 .\cf4 \strokec4 ok\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `Failed to download PDF from Api2Pdf: \cf5 \strokec5 $\{\cf4 \strokec4 pdfDownloadResponse\cf5 \strokec5 .\cf4 \strokec4 statusText\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  pdfBlob \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  pdfDownloadResponse\cf5 \strokec5 .\cf4 \strokec4 blob\cf5 \strokec5 ();\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `PDF downloaded successfully for \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 . Size: \cf5 \strokec5 $\{\cf4 \strokec4 pdfBlob\cf5 \strokec5 .\cf4 \strokec4 size\cf5 \strokec5 \}\cf6 \strokec6  bytes.`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // 4. PDF in Supabase Storage hochladen\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  filePath \cf5 \strokec5 =\cf4 \strokec4  \cf6 \strokec6 `\cf5 \strokec5 $\{\cf4 \strokec4 userId\cf5 \strokec5 \}\cf6 \strokec6 /\cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 .pdf`\cf5 \strokec5 ;\cf4 \strokec4  \cf7 \strokec7 // Eindeutiger Pfad\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Uploading PDF to Supabase Storage: \cf5 \strokec5 $\{\cf8 \strokec8 STORAGE_BUCKET\cf5 \strokec5 \}\cf6 \strokec6 /\cf5 \strokec5 $\{\cf4 \strokec4 filePath\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  data\cf5 \strokec5 :\cf4 \strokec4  uploadData\cf5 \strokec5 ,\cf4 \strokec4  error\cf5 \strokec5 :\cf4 \strokec4  uploadError \cf5 \strokec5 \}\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  supabaseAdmin\cf5 \strokec5 .\cf4 \strokec4 storage\cf5 \strokec5 .\cf2 \strokec2 from\cf5 \strokec5 (\cf8 \strokec8 STORAGE_BUCKET\cf5 \strokec5 ).\cf4 \strokec4 upload\cf5 \strokec5 (\cf4 \strokec4 filePath\cf5 \strokec5 ,\cf4 \strokec4  pdfBlob\cf5 \strokec5 ,\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           contentType\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/pdf'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           upsert\cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 true\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 uploadError\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `Storage Upload Error for \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 :`\cf5 \strokec5 ,\cf4 \strokec4  uploadError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `Storage upload failed: \cf5 \strokec5 $\{\cf4 \strokec4 uploadError\cf5 \strokec5 .\cf4 \strokec4 message\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // 5. \'d6ffentliche URL holen (oder signierte URL, falls Bucket nicht \'f6ffentlich)\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  data\cf5 \strokec5 :\cf4 \strokec4  urlData \cf5 \strokec5 \}\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  supabaseAdmin\cf5 \strokec5 .\cf4 \strokec4 storage\cf5 \strokec5 .\cf2 \strokec2 from\cf5 \strokec5 (\cf8 \strokec8 STORAGE_BUCKET\cf5 \strokec5 ).\cf4 \strokec4 getPublicUrl\cf5 \strokec5 (\cf4 \strokec4 filePath\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  pdfPublicUrl \cf5 \strokec5 =\cf4 \strokec4  urlData\cf5 \strokec5 ?.\cf4 \strokec4 publicUrl\cf5 \strokec5 ;\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 pdfPublicUrl\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 warn\cf5 \strokec5 (\cf6 \strokec6 `Could not get public URL for \cf5 \strokec5 $\{\cf4 \strokec4 filePath\cf5 \strokec5 \}\cf6 \strokec6 . Check bucket permissions.`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Hier k\'f6nnte man stattdessen eine signierte URL generieren\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `PDF uploaded. Public URL: \cf5 \strokec5 $\{\cf4 \strokec4 pdfPublicUrl\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // 6. Invoice-Status in DB aktualisieren\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  error\cf5 \strokec5 :\cf4 \strokec4  updateError \cf5 \strokec5 \}\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  supabaseAdmin\cf5 \strokec5 .\cf2 \strokec2 from\cf5 \strokec5 (\cf6 \strokec6 'invoices'\cf5 \strokec5 ).\cf4 \strokec4 update\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3           pdf_status\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'awaiting_release'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           pdf_url\cf5 \strokec5 :\cf4 \strokec4  pdfPublicUrl\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           updated_at\cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Date\cf5 \strokec5 ().\cf4 \strokec4 toISOString\cf5 \strokec5 ()\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}).\cf4 \strokec4 eq\cf5 \strokec5 (\cf6 \strokec6 'id'\cf5 \strokec5 ,\cf4 \strokec4  invoiceId\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 updateError\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `DB Update Error for \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 :`\cf5 \strokec5 ,\cf4 \strokec4  updateError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \strokec7 // Versuche, das PDF wieder zu l\'f6schen, wenn DB-Update fehlschl\'e4gt? Optional.\cf4 \cb1 \strokec4 \
+\cb3           \cf2 \strokec2 throw\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Error\cf5 \strokec5 (\cf6 \strokec6 `DB update failed: \cf5 \strokec5 $\{\cf4 \strokec4 updateError\cf5 \strokec5 .\cf4 \strokec4 message\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 log\cf5 \strokec5 (\cf6 \strokec6 `Successfully processed invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6 . Status set to awaiting_release.`\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         generatedCount\cf5 \strokec5 ++;\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}\cf4 \strokec4  \cf2 \strokec2 catch\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 innerError\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `Error processing invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceNumber\cf5 \strokec5 \}\cf6 \strokec6  (ID: \cf5 \strokec5 $\{\cf4 \strokec4 invoiceId\cf5 \strokec5 \}\cf6 \strokec6 ):`\cf5 \strokec5 ,\cf4 \strokec4  innerError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         errorCount\cf5 \strokec5 ++;\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 // Versuche, den Status auf 'failed_generation' zu setzen\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 const\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \strokec4  error\cf5 \strokec5 :\cf4 \strokec4  failUpdateError \cf5 \strokec5 \}\cf4 \strokec4  \cf5 \strokec5 =\cf4 \strokec4  \cf2 \strokec2 await\cf4 \strokec4  supabaseAdmin\cf5 \strokec5 .\cf2 \strokec2 from\cf5 \strokec5 (\cf6 \strokec6 'invoices'\cf5 \strokec5 ).\cf4 \strokec4 update\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3           pdf_status\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'failed_generation'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3           updated_at\cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Date\cf5 \strokec5 ().\cf4 \strokec4 toISOString\cf5 \strokec5 ()\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}).\cf4 \strokec4 eq\cf5 \strokec5 (\cf6 \strokec6 'id'\cf5 \strokec5 ,\cf4 \strokec4  invoiceId\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 failUpdateError\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3           console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 `Failed to update status to 'failed_generation' for invoice \cf5 \strokec5 $\{\cf4 \strokec4 invoiceId\cf5 \strokec5 \}\cf6 \strokec6 :`\cf5 \strokec5 ,\cf4 \strokec4  failUpdateError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \}\cf4 \strokec4  \cf7 \strokec7 // End for loop\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 // 7. Ergebnis zur\'fcckgeben\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Response\cf5 \strokec5 (\cf8 \strokec8 JSON\cf5 \strokec5 .\cf4 \strokec4 stringify\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3       message\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 `PDF Generation complete. Processed: \cf5 \strokec5 $\{\cf4 \strokec4 invoicesToProcess\cf5 \strokec5 .\cf4 \strokec4 length\cf5 \strokec5 \}\cf6 \strokec6 , Generated: \cf5 \strokec5 $\{\cf4 \strokec4 generatedCount\cf5 \strokec5 \}\cf6 \strokec6 , Errors: \cf5 \strokec5 $\{\cf4 \strokec4 errorCount\cf5 \strokec5 \}\cf6 \strokec6 `\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       generated\cf5 \strokec5 :\cf4 \strokec4  generatedCount\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       errors\cf5 \strokec5 :\cf4 \strokec4  errorCount\cb1 \
+\cb3     \cf5 \strokec5 \}),\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       status\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 200\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       headers\cf5 \strokec5 :\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 ...\cf4 \strokec4 corsHeaders\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         \cf6 \strokec6 'Content-Type'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/json'\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 \}\cf4 \strokec4  \cf2 \strokec2 catch\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 error\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3     console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 'Error in generate-invoice-pdf function:'\cf5 \strokec5 ,\cf4 \strokec4  error\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 return\cf4 \strokec4  \cf2 \strokec2 new\cf4 \strokec4  \cf8 \strokec8 Response\cf5 \strokec5 (\cf8 \strokec8 JSON\cf5 \strokec5 .\cf4 \strokec4 stringify\cf5 \strokec5 (\{\cf4 \cb1 \strokec4 \
+\cb3       error\cf5 \strokec5 :\cf4 \strokec4  error\cf5 \strokec5 .\cf4 \strokec4 message\cb1 \
+\cb3     \cf5 \strokec5 \}),\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3       status\cf5 \strokec5 :\cf4 \strokec4  \cf9 \strokec9 500\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       headers\cf5 \strokec5 :\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
+\cb3         \cf5 \strokec5 ...\cf4 \strokec4 corsHeaders\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         \cf6 \strokec6 'Content-Type'\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'application/json'\cf4 \cb1 \strokec4 \
+\cb3       \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 \});\cf4 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 \}\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 \});\cf4 \cb1 \strokec4 \
+\
+}

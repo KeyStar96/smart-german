@@ -39,10 +39,10 @@ const translations = {
         courses_title: "Unsere Kurse",
         courses_subtitle: "Entdecken Sie unsere speziell konzipierten Deutschkurse – für Senioren, Erwachsene und für junge Lernende",
         
-        course_50plus_a11_title: "Deutsch A1.1",
+        course_50plus_a11_title: "Deutsch 50+ A1.1",
         course_50plus_a11_desc: "Speziell für Lernende ab 50 Jahren. Langsames Lerntempo, viel Wiederholung und eine entspannte Atmosphäre für den erfolgreichen Einstieg in die deutsche Sprache.",
         
-        course_50plus_a12_title: "Deutsch A1.2",
+        course_50plus_a12_title: "Deutsch 50+ A1.2",
         course_50plus_a12_desc: "Aufbaukurs für Lernende mit ersten Deutschkenntnissen. Vertiefen Sie Ihre Grundlagen und erweitern Sie Ihren Wortschatz.",
         
         course_50plus_a22_title: "Deutsch A2.2",
@@ -64,7 +64,7 @@ const translations = {
         course_gym_desc: "Für Jugendliche ab 14 Jahren mit Deutsch als Zweitsprache. Gezieltes Training der Bildungssprache für den Deutschunterricht auf B1/B2 Niveau.",
         course_gym_content: "Lehrwerk: Prima – Ankommen im Fachunterricht",
         course_gym_topics: "Kursinhalte: Operatoren verstehen • Texte analysieren & interpretieren • Argumentationen verfassen • Bildungssprache trainieren",
-        course_50plus_a21_title: "Deutsch A2.1",
+        course_50plus_a21_title: "Deutsch 50+ A2.1",
         course_50plus_a21_desc: "Fortgeschrittenenkurs für selbstständige Kommunikation. Einkaufen, Arztbesuche und Behördengänge werden zum Kinderspiel.",
 
         course_speaking12_title: "Sprechtraining A1.2",
@@ -72,6 +72,8 @@ const translations = {
 
         course_children_title: "Deutsch in den Naturwissenschaften",
         course_children_desc: "Für Kinder und Jugendliche der Klassen 1-10. Fachsprachliches Deutsch für naturwissenschaftliche Fächer. Perfekt zur Unterstützung des Schulunterrichts.",
+        course_children_desc_detailed: "In diesem Kurs werden Kinder und Jugendliche mit einer anderen Erstsprache als Deutsch gezielt beim Verstehen naturwissenschaftlicher Themen unterstützt. Viele Fachbegriffe in Biologie, Physik und Chemie sind komplex und unterscheiden sich stark von der Alltagssprache – selbst mit guten allgemeinen Deutschkenntnissen (z. B. B1) bleibt der Fachunterricht oft schwer verständlich.\n\nWir üben den Aufbau und die Bedeutung zentraler Fachbegriffe, das Lesen und Verstehen von Sachtexten, das Beschreiben von Experimenten und das Erklären naturwissenschaftlicher Zusammenhänge auf Deutsch.\n\nDer Unterricht findet in einer kleinen Gruppe (max. 8 Teilnehmende) statt, sodass individuell auf sprachliche und fachliche Schwierigkeiten eingegangen werden kann.\nDer Kurs wird von einer Lehrkraft geleitet, die Deutsch und Biologie studiert hat und Erfahrung im DaZ-Unterricht besitzt.", // <- NEU: Lange Beschreibung
+        course_50plus_desc_detailed: "Diese Kursreihe richtet sich an Menschen ab 50 Jahren, die Deutsch in ihrem eigenen Tempo, mit passenden Methoden und in einer unterstützenden Lernatmosphäre lernen möchten.\nÄltere Lernende werden im klassischen Sprachunterricht oft übersehen – es gibt kaum Integrationskurse oder Materialien, die ihre Lebensrealität, Lernerfahrungen und Bedürfnisse wirklich berücksichtigen. Genau hier setzt dieses Kursangebot an.\n\nIch widme meine Masterarbeit an der Leibniz Universität Hannover dem Thema, wie Deutschunterricht für ältere Lernende optimiert werden kann. Dabei kombiniere ich aktuelle wissenschaftliche Erkenntnisse zum Sprachenlernen im Alter mit meiner praktischen Unterrichtserfahrung.\nEin zentraler Bestandteil meiner Arbeit und meines Unterrichts ist der bewusste Einbezug der Muttersprache, um Verständnis, Motivation und langfristigen Lernerfolg zu fördern.\n\nDas weit verbreitete Vorurteil, ältere Menschen könnten keine neue Sprache mehr lernen, ist wissenschaftlich nicht haltbar. Mit den richtigen Methoden, Geduld und gezielter Förderung können auch Menschen über 50 eine neue Sprache erfolgreich erwerben.",
 
         // Course Details
         course_detail_time: "pro Woche",
@@ -95,7 +97,7 @@ const translations = {
         schedule_filter_all: "Alle Kurse",
         schedule_filter_senior: "Deutsch",
         schedule_filter_speaking: "Sprechtraining",
-        schedule_filter_youth: "Deutschunterricht",
+        schedule_filter_youth: "Kurse für Jugendliche",
         schedule_filter_online: "Online",
         
         schedule_stat_courses: "Kurse sichtbar",
@@ -186,14 +188,18 @@ const translations = {
         // Transparente Preisgestaltung
         pricing_transparency_title: "Transparente Preisgestaltung",
         pricing_transparency_intro: "Unsere Kurse werden monatlich abgerechnet. Der Preis richtet sich nach der Anzahl der tatsächlich stattfindenden Unterrichtseinheiten im jeweiligen Monat.",
-        pricing_example_typical: "Typischer Monat",
-        pricing_example_typical_desc: "Im Durchschnitt finden 4-5 Einheiten pro Monat statt (à 45 Minuten)",
         pricing_examples_title: "Preisbeispiele",
         pricing_example_4: "Monat mit 4 Einheiten: 48€",
         pricing_example_5: "Monat mit 5 Einheiten: 60€",
+               
+        pricing_example_typical: "Typischer Monat",
+        pricing_example_typical_desc: "Die Anzahl der Kurstermine variiert je nach Monat (z.B. durch Feiertage oder Monatslänge).", // <-- Geändert
+        pricing_example_specific_title: "Konkretes Beispiel", // <-- Neuer Key
+        pricing_example_course_info: "Kurs: Deutsch 50+ A1.1 (2,50€ / 45 Min. Einheit)", // <-- Neuer Key
+        pricing_example_course_calc: "Monat mit 8 Terminen (16 Einheiten): 40€\nMonat mit 9 Terminen (18 Einheiten): 45€", // <-- Neuer Key
         pricing_fairness_title: "Fair & Transparent",
         pricing_fairness_desc: "Sie bezahlen nur für tatsächlich stattfindende Einheiten. Feiertage und Ferien werden berücksichtigt.",
-                
+        
         // About Section
         owner_name: "Anastasia Sitov",
         about_title: "Über mich",
@@ -444,10 +450,10 @@ const translations = {
         courses_title: "Наши курсы",
         courses_subtitle: "Откройте для себя наши специально разработанные курсы немецкого языка - для пожилых людей, взрослых и молодых учащихся",
         
-        course_50plus_a11_title: "Немецкий A1.1",
+        course_50plus_a11_title: "Немецкий 50+ A1.1",
         course_50plus_a11_desc: "Специально для учащихся от 50 лет. Медленный темп обучения, много повторений и спокойная атмосфера для успешного начала изучения немецкого языка.",
         
-        course_50plus_a12_title: "Немецкий A1.2",
+        course_50plus_a12_title: "Немецкий 50+ A1.2",
         course_50plus_a12_desc: "Продолжающий курс для учащихся с первыми знаниями немецкого. Углубите свои основы и расширьте словарный запас.",
         
         course_50plus_a22_title: "Немецкий A2.2",
@@ -469,7 +475,7 @@ const translations = {
         course_gym_desc: "Для подростков от 14 лет с немецким как вторым языком. Целенаправленная тренировка образовательного языка для уроков немецкого на уровне B1/B2.",
         course_gym_content: "Учебник: Prima – Ankommen im Fachunterricht",
         course_gym_topics: "Содержание курса: Понимание операторов • Анализ и интерпретация текстов • Написание аргументаций • Тренировка образовательного языка",
-        course_50plus_a21_title: "Немецкий A2.1",
+        course_50plus_a21_title: "Немецкий 50+ A2.1",
         course_50plus_a21_desc: "Продвинутый курс для самостоятельного общения. Покупки, визиты к врачу и общение с госучреждениями на немецком языке.",
 
         course_speaking12_title: "Разговорная практика A1.2",
@@ -477,6 +483,8 @@ const translations = {
 
         course_children_title: "Немецкий в естественных науках",
         course_children_desc: "Для детей и подростков 1-10 классов. Специализированный немецкий для естественнонаучных предметов. Идеально для поддержки школьных занятий.",
+        course_children_desc_detailed: "В этом курсе дети и подростки, для которых немецкий не является родным языком, получают целенаправленную поддержку в понимании естественнонаучных тем. Многие специальные термины в биологии, физике и химии сложны и сильно отличаются от повседневного языка – даже при хорошем общем знании немецкого (например, B1) уроки по предметам часто остаются трудными для понимания.\n\nМы тренируем структуру и значение ключевых специальных терминов, чтение и понимание научных текстов, описание экспериментов и объяснение естественнонаучных связей на немецком языке.\n\nЗанятия проходят в небольшой группе (макс. 8 участников), что позволяет индивидуально подходить к языковым и предметным трудностям.\nКурс ведет преподаватель, изучавший немецкий язык и биологию и имеющий опыт преподавания немецкого как второго языка (DaZ).", // <- НОВОЕ: Длинное описание
+        course_50plus_desc_detailed: "Эта серия курсов предназначена для людей старше 50 лет, которые хотят изучать немецкий язык в своем собственном темпе, с подходящими методами и в поддерживающей учебной атмосфере.\nПожилых учащихся часто упускают из виду в классическом языковом обучении – почти нет интеграционных курсов или материалов, которые действительно учитывали бы их жизненные реалии, опыт обучения и потребности. Именно здесь и начинается это предложение курсов.\n\nЯ посвящаю свою магистерскую диссертацию в Ганноверском университете имени Лейбница теме оптимизации преподавания немецкого языка для пожилых учащихся. При этом я сочетаю актуальные научные данные об изучении языков в пожилом возрасте со своим практическим опытом преподавания.\nЦентральным компонентом моей работы и моего преподавания является сознательное включение родного языка для содействия пониманию, мотивации и долгосрочному успеху в обучении.\n\nШироко распространенное предубеждение о том, что пожилые люди больше не могут выучить новый язык, научно необоснованно. С правильными методами, терпением и целенаправленной поддержкой люди старше 50 лет также могут успешно освоить новый язык.",
 
         // Course Details
         course_detail_time: "в неделю",
@@ -500,7 +508,7 @@ const translations = {
         schedule_filter_all: "Все курсы",
         schedule_filter_senior: "Немецкий",
         schedule_filter_speaking: "Разговорная практика",
-        schedule_filter_youth: "Уроки немецкого",
+        schedule_filter_youth: "Курсы для молодежи",
         schedule_filter_online: "Онлайн",
         
         schedule_stat_courses: "Курсов видимо",
@@ -591,14 +599,18 @@ const translations = {
         // Прозрачное ценообразование
         pricing_transparency_title: "Прозрачное ценообразование",
         pricing_transparency_intro: "Наши курсы оплачиваются ежемесячно. Цена зависит от количества фактически проведенных занятий в соответствующем месяце.",
-        pricing_example_typical: "Типичный месяц",
-        pricing_example_typical_desc: "В среднем проводится 4-5 занятий в месяц (по 45 минут)",
         pricing_examples_title: "Примеры цен",
         pricing_example_4: "Месяц с 4 занятиями: 48€",
         pricing_example_5: "Месяц с 5 занятиями: 60€",
+        
+        pricing_example_typical: "Типичный месяц",
+        pricing_example_typical_desc: "Количество занятий варьируется в зависимости от месяца (например, из-за праздников или продолжительности месяца).", // <-- Изменено
+        pricing_example_specific_title: "Конкретный пример", // <-- Новый ключ
+        pricing_example_course_info: "Курс: Немецкий 50+ A1.1 (2,50€ / 45 мин. занятие)", // <-- Новый ключ
+        pricing_example_course_calc: "Месяц с 8 занятиями (16 единиц): 40€\nМесяц с 9 занятиями (18 единиц): 45€", // <-- Новый ключ
         pricing_fairness_title: "Честно и прозрачно",
         pricing_fairness_desc: "Вы платите только за фактически проведенные занятия. Праздничные дни и каникулы учитываются.",
-        
+
         // About Section
         owner_name: "Анастасия Ситов",
         about_title: "Обо мне",
@@ -850,10 +862,10 @@ const translations = {
         courses_title: "Наші курси",
         courses_subtitle: "Відкрийте для себе наші спеціально розроблені курси німецької мови - для літніх людей, дорослих та молодих учнів",
         
-        course_50plus_a11_title: "Німецька A1.1",
+        course_50plus_a11_title: "Німецька 50+ A1.1",
         course_50plus_a11_desc: "Спеціально для учнів від 50 років. Повільний темп навчання, багато повторень та спокійна атмосфера для успішного початку вивчення німецької мови.",
         
-        course_50plus_a12_title: "Німецька A1.2",
+        course_50plus_a12_title: "Німецька 50+ A1.2",
         course_50plus_a12_desc: "Продовжуючий курс для учнів з першими знаннями німецької. Поглибіть свої основи та розширте словниковий запас.",
         
         course_50plus_a22_title: "Німецька A2.2",
@@ -875,7 +887,7 @@ const translations = {
         course_gym_desc: "Для підлітків від 14 років з німецькою як другою мовою. Цілеспрямоване тренування освітньої мови для уроків німецької на рівні B1/B2.",
         course_gym_content: "Підручник: Prima – Ankommen im Fachunterricht",
         course_gym_topics: "Зміст курсу: Розуміння операторів • Аналіз та інтерпретація текстів • Написання аргументацій • Тренування освітньої мови",
-        course_50plus_a21_title: "Німецька A2.1",
+        course_50plus_a21_title: "Німецька 50+ A2.1",
         course_50plus_a21_desc: "Просунутий курс для самостійного спілкування. Покупки, візити до лікаря та спілкування з органами влади стають дитячою забавою.",
 
         course_speaking12_title: "Розмовна практика A1.2",
@@ -883,6 +895,8 @@ const translations = {
 
         course_children_title: "Німецька в природничих науках",
         course_children_desc: "Для дітей та підлітків 1-10 класів. Спеціалізована німецька для природничих предметів. Ідеально для підтримки шкільних занять.",
+        course_children_desc_detailed: "У цьому курсі діти та підлітки, для яких німецька не є рідною мовою, отримують цілеспрямовану підтримку в розумінні природничих тем. Багато фахових термінів з біології, фізики та хімії є складними та значно відрізняються від повсякденної мови – навіть з добрими загальними знаннями німецької (напр., B1) фахові уроки часто залишаються важкими для розуміння.\n\nМи практикуємо структуру та значення ключових фахових термінів, читання та розуміння наукових текстів, опис експериментів та пояснення природничих зв'язків німецькою мовою.\n\nЗаняття проходять у невеликій групі (макс. 8 учасників), що дозволяє індивідуально підходити до мовних та фахових труднощів.\nКурс веде викладач, який вивчав німецьку мову та біологію та має досвід викладання німецької як другої мови (DaZ).", // <- НОВЕ: Довгий опис
+        course_50plus_desc_detailed: "Ця серія курсів призначена для людей віком від 50 років, які хочуть вивчати німецьку мову у власному темпі, за допомогою відповідних методів та у сприятливій навчальній атмосфері.\nСтарших учнів часто не беруть до уваги у класичному мовному навчанні – майже немає інтеграційних курсів або матеріалів, які б дійсно враховували їхню життєву реальність, досвід навчання та потреби. Саме тут і починається ця пропозиція курсів.\n\nЯ присвячую свою магістерську роботу в Ганноверському університеті імені Лейбніца темі оптимізації викладання німецької мови для старших учнів. При цьому я поєдную актуальні наукові знання про вивчення мов у похилому віці зі своїм практичним досвідом викладання.\nЦентральним компонентом моєї роботи та мого викладання є свідоме включення рідної мови для сприяння розумінню, мотивації та довгостроковому успіху в навчанні.\n\nШироко поширене упередження, що літні люди більше не можуть вивчити нову мову, є науково необґрунтованим. За допомогою правильних методів, терпіння та цілеспрямованої підтримки люди старше 50 років також можуть успішно опанувати нову мову.",
 
         // Course Details
         course_detail_time: "на тиждень",
@@ -906,7 +920,7 @@ const translations = {
         schedule_filter_all: "Всі курси",
         schedule_filter_senior: "Німецька 50+",
         schedule_filter_speaking: "Розмовна практика",
-        schedule_filter_youth: "Уроки німецької",
+        schedule_filter_youth: "Курси для молоді",
         schedule_filter_online: "Онлайн",
         
         schedule_stat_courses: "Курсів видимо",
@@ -1005,11 +1019,15 @@ const translations = {
         // Прозоре ціноутворення
         pricing_transparency_title: "Прозоре ціноутворення",
         pricing_transparency_intro: "Наші курси оплачуються щомісяця. Ціна залежить від кількості фактично проведених занять у відповідному місяці.",
-        pricing_example_typical: "Типовий місяць",
-        pricing_example_typical_desc: "В середньому проводиться 4-5 занять на місяць (по 45 хвилин)",
         pricing_examples_title: "Приклади цін",
         pricing_example_4: "Місяць з 4 заняттями: 48€",
         pricing_example_5: "Місяць з 5 заняттями: 60€",
+    
+        pricing_example_typical: "Типовий місяць",
+        pricing_example_typical_desc: "Кількість занять варіюється залежно від місяця (напр., через свята або тривалість місяця).", // <-- Змінено
+        pricing_example_specific_title: "Конкретний приклад", // <-- Новий ключ
+        pricing_example_course_info: "Курс: Німецька 50+ A1.1 (2,50€ / 45 хв. заняття)", // <-- Новий ключ
+        pricing_example_course_calc: "Місяць з 8 заняттями (16 одиниць): 40€\nМісяць з 9 заняттями (18 одиниць): 45€", // <-- Новий ключ
         pricing_fairness_title: "Чесно і прозоро",
         pricing_fairness_desc: "Ви платите лише за фактично проведені заняття. Святкові дні та канікули враховуються.",
                 
@@ -1259,10 +1277,10 @@ const translations = {
         courses_title: "Our Courses",
         courses_subtitle: "Discover our specially designed German courses - for seniors, adults, and young learners",
         
-        course_50plus_a11_title: "German A1.1",
+        course_50plus_a11_title: "German 50+ A1.1",
         course_50plus_a11_desc: "Specially for learners aged 50 and over. Slow learning pace, lots of repetition and a relaxed atmosphere for a successful start in learning German.",
         
-        course_50plus_a12_title: "German A1.2",
+        course_50plus_a12_title: "German 50+ A1.2",
         course_50plus_a12_desc: "Continuation course for learners with first German knowledge. Deepen your basics and expand your vocabulary.",
         
         course_50plus_a22_title: "German A2.2",
@@ -1284,7 +1302,7 @@ const translations = {
         course_gym_desc: "For teenagers aged 14 and over with German as a second language. Targeted training of academic language for German lessons at B1/B2 level.",
         course_gym_content: "Textbook: Prima – Ankommen im Fachunterricht",
         course_gym_topics: "Course content: Understanding operators • Analyzing & interpreting texts • Writing argumentations • Training academic language",
-        course_50plus_a21_title: "German A2.1",
+        course_50plus_a21_title: "German 50+ A2.1",
         course_50plus_a21_desc: "Advanced course for independent communication. Shopping, doctor visits, and dealing with authorities become child's play.",
 
         course_speaking12_title: "Speaking Training A1.2",
@@ -1292,6 +1310,8 @@ const translations = {
 
         course_children_title: "German in Natural Sciences",
         course_children_desc: "For children and teenagers in grades 1-10. Technical German for science subjects. Perfect to support school lessons.",
+        course_children_desc_detailed: "In this course, children and teenagers whose first language is not German receive targeted support in understanding scientific topics. Many technical terms in biology, physics, and chemistry are complex and differ significantly from everyday language – even with good general German skills (e.g., B1), science classes often remain difficult to understand.\n\nWe practice the structure and meaning of key technical terms, reading and understanding non-fiction texts, describing experiments, and explaining scientific concepts in German.\n\nThe class takes place in a small group (max. 8 participants), allowing for individual attention to linguistic and subject-specific difficulties.\nThe course is led by a teacher who has studied German and Biology and has experience in teaching German as a second language (DaZ).", // <- NEW: Long description
+        course_50plus_desc_detailed: "This course series is aimed at people aged 50 and over who want to learn German at their own pace, with suitable methods, and in a supportive learning atmosphere.\nOlder learners are often overlooked in traditional language teaching – there are hardly any integration courses or materials that truly consider their life reality, learning experiences, and needs. This is exactly where this course offering comes in.\n\nI am dedicating my master's thesis at Leibniz University Hannover to the topic of how German lessons for older learners can be optimized. I combine current scientific findings on language learning in old age with my practical teaching experience.\nA central component of my work and my teaching is the conscious inclusion of the native language to promote understanding, motivation, and long-term learning success.\n\nThe widespread prejudice that older people can no longer learn a new language is scientifically unfounded. With the right methods, patience, and targeted support, people over 50 can also successfully acquire a new language.",
 
         // Course Details
         course_detail_time: "per week",
@@ -1314,7 +1334,7 @@ const translations = {
         schedule_filter_all: "All Courses",
         schedule_filter_senior: "German",
         schedule_filter_speaking: "Speaking Practice",
-        schedule_filter_youth: "German Class",
+        schedule_filter_youth: "Courses for Youth",
         schedule_filter_online: "Online",
         
         schedule_stat_courses: "Courses visible",
@@ -1408,20 +1428,24 @@ const translations = {
         pricing_youth_feature3: "Max. 6-8 participants",
         pricing_youth_feature4: "Online via Zoom",
         pricing_youth_feature5: "Personal feedback",
+
+        pricing_example_typical: "Typical Month",
+        pricing_example_typical_desc: "The number of course sessions varies depending on the month (e.g., due to holidays or month length).", // <-- Changed
+        pricing_example_specific_title: "Specific Example", // <-- New Key
+        pricing_example_course_info: "Course: German 50+ A1.1 (€2.50 / 45 min unit)", // <-- New Key
+        pricing_example_course_calc: "Month with 8 sessions (16 units): €40\nMonth with 9 sessions (18 units): €45", // <-- New Key
+        pricing_fairness_title: "Fair & Transparent",
+        pricing_fairness_desc: "You only pay for sessions that actually take place. Public holidays and vacations are taken into account.",
         
         pricing_cta: "Select",
 
         // Transparent Pricing
         pricing_transparency_title: "Transparent Pricing",
         pricing_transparency_intro: "Our courses are billed monthly. The price is based on the number of sessions actually taking place in the respective month.",
-        pricing_example_typical: "Typical Month",
-        pricing_example_typical_desc: "On average, 4-5 sessions take place per month (45 minutes each)",
         pricing_examples_title: "Pricing Examples",
         pricing_example_4: "Month with 4 sessions: €48",
         pricing_example_5: "Month with 5 sessions: €60",
-        pricing_fairness_title: "Fair & Transparent",
-        pricing_fairness_desc: "You only pay for sessions that actually take place. Public holidays and vacations are taken into account.",
-        
+    
         // About Section
         owner_name: "Anastasia Sitov",
         about_title: "About Me",

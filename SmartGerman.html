@@ -820,6 +820,8 @@
         }
 
         .course-card {
+            cursor: pointer; /* Zeigt an, dass die Karte klickbar ist */
+            /* Beibehaltung der bestehenden Stile */
             background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
@@ -831,6 +833,101 @@
             flex-direction: column;
             text-align: center;
             border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        /* Overlay für den Hintergrund */
+        .modal-overlay {
+            display: none; /* Standardmäßig ausgeblendet */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Dunkler Hintergrund */
+            backdrop-filter: blur(5px); /* Weichzeichner-Effekt */
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* Modal-Container */
+        .course-modal {
+            display: none; /* Standardmäßig ausgeblendet */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95); /* Startposition für Animation */
+            background-color: white;
+            border-radius: 20px; /* Abgerundete Ecken */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* Stärkerer Schatten */
+            z-index: 1001;
+            max-width: 500px; /* Breite des Modals */
+            width: 90%;
+            opacity: 0;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            overflow: hidden; /* Verhindert, dass Inhalt überläuft */
+        }
+
+        /* Sichtbarer Zustand für Overlay und Modal */
+        .modal-overlay.active,
+        .course-modal.active {
+            display: block; /* Machen Elemente sichtbar */
+            opacity: 1;
+        }
+
+        .course-modal.active {
+            transform: translate(-50%, -50%) scale(1); /* Endposition für Animation */
+        }
+
+        /* Inhalt des Modals */
+        .course-modal-content {
+            padding: 30px 35px;
+            max-height: 70vh; /* Maximale Höhe, falls viel Text */
+            overflow-y: auto; /* Scrollbar bei Bedarf */
+        }
+
+        .course-modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: #1d1d1f;
+            text-align: center;
+        }
+
+        .course-modal-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #6e6e73;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        /* Schließen-Button */
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e8e8ed; /* Heller Grauton */
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            color: #6e6e73;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background-color: #d2d2d7; /* Etwas dunkler */
+            color: #1d1d1f;
+        }
+
+        /* Verhindert Scrollen des Hintergrunds, wenn Modal offen ist */
+        body.modal-open {
+            overflow: hidden;
         }
 
         .course-card:hover {
@@ -2735,12 +2832,15 @@
             
             <div class="courses-grid">
                 <!-- Deutsch 50+ A1.1 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_50plus_a11_title"
+                    data-course-desc-key="course_50plus_a11_desc"
+                    data-course-desc-detailed-key="course_50plus_desc_detailed">
                     <div class="course-card-content">
                         <div>
                             <h3>
                                 <span class="course-icon">📚</span>
-                                <span data-i18n="course_50plus_a11_title">Deutsch A1.1</span>
+                                <span data-i18n="course_50plus_a11_title">Deutsch A1.1 50+</span>
                             </h3>
                             <p data-i18n="course_50plus_a11_desc">Speziell für Lernende ab 50 Jahren. Langsames Lerntempo, viel Wiederholung und eine entspannte Atmosphäre für den erfolgreichen Einstieg in die deutsche Sprache.</p>
                             
@@ -2767,7 +2867,10 @@
     
                 <!-- Deutsch 50+ A1.2 -->
                 <div class="course-card">
-                    <div class="course-card-content">
+                    <div class="course-card-content"
+                        data-course-title-key="course_50plus_a12_title"
+                        data-course-desc-key="course_50plus_a12_desc"
+                        data-course-desc-detailed-key="course_50plus_desc_detailed">
                         <div>
                             <h3>
                                 <span class="course-icon">📖</span>
@@ -2797,7 +2900,10 @@
                 </div>
     
                 <!-- Deutsch 50+ A2.1 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_50plus_a21_title"
+                    data-course-desc-key="course_50plus_a21_desc"
+                    data-course-desc-detailed-key="course_50plus_desc_detailed">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2828,7 +2934,9 @@
                 </div>
     
                 <!-- Sprechtraining A1.1 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_speaking1_title"
+                    data-course-desc-key="course_speaking1_desc">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2859,7 +2967,9 @@
                 </div>
     
                 <!-- Sprechtraining A1.2 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_speaking12_title"
+                    data-course-desc-key="course_speaking12_desc">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2890,7 +3000,9 @@
                 </div>
 
                 <!-- Sprechtraining A2 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_speaking2_title"
+                    data-course-desc-key="course_speaking2_desc">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2921,7 +3033,10 @@
                 </div>
 
                 <!-- Deutsch in den Naturwissenschaften -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_children_title"
+                    data-course-desc-key="course_children_desc"
+                    data-course-desc-detailed-key="course_children_desc_detailed">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2952,7 +3067,9 @@
                 </div>
     
                 <!-- Grundlagen der deutschen Sprache A1.1  -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_online_title"
+                    data-course-desc-key="course_online_desc">
                     <div class="course-card-content">
                         <div>
                             <h3>
@@ -2983,14 +3100,16 @@
                 </div>
     
                 <!-- Fit für den Deutschunterricht B1/B2 -->
-                <div class="course-card">
+                <div class="course-card"
+                    data-course-title-key="course_gym_title"
+                    data-course-desc-key="course_gym_desc">
                     <div class="course-card-content">
                         <div>
                             <h3>
                                 <span class="course-icon">🎓</span>
                                 <span data-i18n="course_gym_title">Fit für den Deutschunterricht B1/B2</span>
                             </h3>
-                            <p data-i18n="course_youth_desc">Für Jugendliche ab 14 Jahren mit Deutsch als Zweitsprache. Gezieltes Training der Bildungssprache für den Deutschunterricht auf B1/B2 Niveau.</p>
+                            <p data-i18n="course_gym_desc">Für Jugendliche ab 14 Jahren mit Deutsch als Zweitsprache. Gezieltes Training der Bildungssprache für den Deutschunterricht auf B1/B2 Niveau.</p>
                             
                             <div class="course-details">
                                 <div class="course-detail">
@@ -3037,20 +3156,26 @@
                                 <div class="example-icon">📅</div>
                                 <div class="example-content">
                                     <h4 data-i18n="pricing_example_typical">Typischer Monat</h4>
-                                    <p data-i18n="pricing_example_typical_desc">Im Durchschnitt finden <strong>4-5 Einheiten</strong> pro Monat statt (à 45 Minuten)</p>
+                                    <p data-i18n="pricing_example_typical_desc">Im Durchschnitt finden <strong>4-5 Einheiten</strong> pro Monat statt</p>
                                 </div>
                             </div>
                             
                             <div class="example-item highlighted">
                                 <div class="example-icon">💰</div>
                                 <div class="example-content">
-                                    <h4 data-i18n="pricing_examples_title">Preisbeispiele</h4>
-                                    <ul>
-                                        <li data-i18n="pricing_example_4">Monat mit 4 Einheiten: <strong>48€</strong></li>
-                                        <li data-i18n="pricing_example_5">Monat mit 5 Einheiten: <strong>60€</strong></li>
-                                    </ul>
-                                </div>
+                                    <h4 data-i18n="pricing_example_specific_title">Konkretes Beispiel</h4> <p style="font-weight: 500; margin-bottom: 5px;" data-i18n="pricing_example_course_info">Kurs: Deutsch 50+ A1.1 (2,50€ / 45 Min. Einheit)</p> <p style="white-space: pre-line;" data-i18n="pricing_example_course_calc">Monat mit 8 Terminen (16 Einheiten): 40€
+                            Monat mit 9 Terminen (18 Einheiten): 45€</p> </div>
                             </div>
+                            
+                            <style>
+                                p[data-i18n="pricing_example_course_calc"] {
+                                    white-space: pre-line; /* Damit \n als Zeilenumbruch interpretiert wird */
+                                    margin: 10px 0 0 0; /* Etwas Abstand nach oben */
+                                    font-size: 15px; /* Kleinere Schrift */
+                                    color: #1d1d1f; /* Standard Textfarbe */
+                                    line-height: 1.6;
+                                }
+                            </style>
                             
                             <div class="example-item">
                                 <div class="example-icon">🎉</div>
@@ -3267,7 +3392,7 @@
                             <td class="course-cell senior" data-category="seniors">
                                 <div class="course-block">
                                     <div class="course-badge" data-i18n="course_badge_presence">Präsenz</div>
-                                    <strong><span data-i18n="course_50plus_a11_title">Deutsch A1.1</span></strong>
+                                    <strong><span data-i18n="course_50plus_a11_title">Deutsch A1.1 50+</span></strong>
                                     <span class="course-info">📍 <span data-i18n="schedule_course_location">Königstraße 20</span></span>
                                     <span class="course-info">👥 <span data-i18n="course_detail_max">Max.</span> 16 <span data-i18n="course_detail_participants">TN</span></span>
                                     <span class="course-price">40€/<span data-i18n="course_detail_per_month">Monat</span></span>
@@ -3277,7 +3402,7 @@
                             <td class="course-cell senior" data-category="seniors">
                                 <div class="course-block">
                                     <div class="course-badge" data-i18n="course_badge_presence">Präsenz</div>
-                                    <strong><span data-i18n="course_50plus_a11_title">Deutsch A1.1</span></strong>
+                                    <strong><span data-i18n="course_50plus_a11_title">Deutsch A1.1 50+</span></strong>
                                     <span class="course-info">📍 <span data-i18n="schedule_course_location">Königstraße 20</span></span>
                                     <span class="course-info">👥 <span data-i18n="course_detail_max">Max.</span> 16 <span data-i18n="course_detail_participants">TN</span></span>
                                     <span class="course-price">40€/<span data-i18n="course_detail_per_month">Monat</span></span>
@@ -7218,6 +7343,116 @@ document.querySelector('[data-tab="community"]')?.addEventListener('click', func
                 }
             });
         });
+
+        // --- NEUES JAVASCRIPT FÜR KURS-MODAL ---
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseCards = document.querySelectorAll('.course-card');
+            const modalOverlay = document.getElementById('courseModalOverlay');
+            const modal = document.getElementById('courseModal');
+            const modalTitle = document.getElementById('courseModalTitle');
+            const modalDesc = document.getElementById('courseModalDesc');
+            const closeModalBtn = document.getElementById('courseModalCloseBtn');
+
+            // Funktion zum Öffnen des Modals
+            function openCourseModal(titleKey, descKey) {
+                // Hole die übersetzten Texte basierend auf der aktuellen Sprache
+                const currentTranslations = translations[currentLanguage] || translations['de'];
+                const title = currentTranslations[titleKey] || 'Kursinformation';
+                const description = currentTranslations[descKey] || 'Keine Beschreibung verfügbar.';
+
+                // Setze Inhalt des Modals
+                modalTitle.textContent = title;
+                modalDesc.innerHTML = description.replace(/\n/g, '<br>'); // Ersetze Zeilenumbrüche für HTML
+
+                // Zeige Modal und Overlay mit Animation
+                modalOverlay.classList.add('active');
+                modal.classList.add('active');
+                document.body.classList.add('modal-open'); // Hintergrund-Scrollen verhindern
+            }
+
+            // Funktion zum Schließen des Modals
+            function closeCourseModal() {
+                modalOverlay.classList.remove('active');
+                modal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            }
+
+            // Event Listener für jede Kurskarte hinzufügen
+            courseCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const titleKey = this.dataset.courseTitleKey;
+                    // NEU: Prüfe, ob es einen speziellen Key für die detaillierte Beschreibung gibt
+                    const detailedDescKey = this.dataset.courseDescDetailedKey;
+                    const descKey = detailedDescKey || this.dataset.courseDescKey; // Nutze den detaillierten Key, falls vorhanden, sonst den normalen
+
+                    if (titleKey && descKey) {
+                        openCourseModal(titleKey, descKey); // Übergib den passenden descKey
+                    } else {
+                        console.error("Kurskarte hat keine data-Attribute für Titel/Beschreibung:", this);
+                        // Fallback bleibt gleich
+                        const fallbackTitle = this.querySelector('h3 span[data-i18n]')?.textContent || 'Kurs';
+                        const fallbackDesc = this.querySelector('p[data-i18n]')?.textContent || 'Details nicht gefunden.';
+                        modalTitle.textContent = fallbackTitle;
+                        modalDesc.textContent = fallbackDesc;
+                        modalOverlay.classList.add('active');
+                        modal.classList.add('active');
+                        document.body.classList.add('modal-open');
+                    }
+                });
+            });
+
+            // Event Listener zum Schließen (Button und Overlay)
+            if(closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeCourseModal);
+            }
+            if(modalOverlay) {
+                modalOverlay.addEventListener('click', closeCourseModal);
+            }
+
+            // Sicherstellen, dass Klicks im Modal-Inhalt das Modal nicht schließen
+            if(modal) {
+                modal.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Verhindert, dass Klick an Overlay weitergegeben wird
+                });
+            }
+
+            // Anmelde-Button im Modal soll das Modal schließen und zum Anmelde-Modal scrollen/öffnen
+            const modalRegisterButton = modal.querySelector('a[href="#anmelden"]');
+            if(modalRegisterButton) {
+                modalRegisterButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Verhindert Standard-Anker-Verhalten
+                    closeCourseModal(); // Kurs-Modal schließen
+
+                    // Kurzes Timeout, damit das Schließen abgeschlossen ist
+                    setTimeout(() => {
+                        // Finde den ersten "Jetzt anmelden" Button auf der Hauptseite und klicke ihn
+                        const mainRegisterButton = document.querySelector('.hero a[href="#anmelden"]');
+                        if (mainRegisterButton) {
+                            mainRegisterButton.click(); // Simuliert Klick, um Anmelde-Modal zu öffnen
+                        } else {
+                            // Fallback: Zur Anmelde-Sektion scrollen (falls vorhanden)
+                            const anmeldeSection = document.getElementById('anmelden'); // Annahme: Es gibt eine Sektion mit dieser ID
+                            if(anmeldeSection) {
+                                anmeldeSection.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }
+                    }, 100); // 100ms Verzögerung
+                });
+            }
+
+
+        });
+        // --- ENDE NEUES JAVASCRIPT ---
     </script>
+    <div class="modal-overlay" id="courseModalOverlay"></div>
+    <div class="course-modal" id="courseModal">
+        <button class="modal-close-btn" id="courseModalCloseBtn">×</button>
+        <div class="course-modal-content">
+            <h3 id="courseModalTitle">Kurs Titel</h3>
+            <p id="courseModalDesc">Kursbeschreibung hier...</p>
+            <a href="#anmelden" class="apple-button blue" style="display: block; text-align: center; margin-top: 20px;" data-i18n="hero_cta">Jetzt anmelden</a>
+        </div>
+    </div>
 </body>
 </html>
