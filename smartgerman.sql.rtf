@@ -107,7 +107,7 @@ CREATE TABLE public.enrollments (\
   course_id uuid NOT NULL,\
   registration_id uuid,\
   enrollment_date timestamp with time zone DEFAULT now(),\
-  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'completed'::text, 'cancelled'::text, 'paused'::text])),\
+  status text NOT NULL DEFAULT 'active'::text CHECK (status = ANY (ARRAY['active'::text, 'completed'::text, 'cancelled'::text, 'paused'::text, 'pending'::text])),\
   completion_date timestamp with time zone,\
   certificate_issued boolean DEFAULT false,\
   certificate_issued_at timestamp with time zone,\

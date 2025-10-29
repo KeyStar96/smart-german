@@ -1,10 +1,10 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2709
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
 {\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red212\green212\blue212;
-\red100\green117\blue135;\red36\green168\blue107;\red83\green83\blue83;\red70\green137\blue204;\red167\green197\blue152;
+\red83\green83\blue83;\red100\green117\blue135;\red36\green168\blue107;\red70\green137\blue204;\red167\green197\blue152;
 }
 {\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c86275\c86275\c86275;
-\cssrgb\c46667\c53333\c60000;\cssrgb\c14118\c70588\c49412;\cssrgb\c40000\c40000\c40000;\cssrgb\c33725\c61176\c83922;\cssrgb\c70980\c80784\c65882;
+\cssrgb\c40000\c40000\c40000;\cssrgb\c46667\c53333\c60000;\cssrgb\c14118\c70588\c49412;\cssrgb\c33725\c61176\c83922;\cssrgb\c70980\c80784\c65882;
 }
 \paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
 \deftab720
@@ -15,70 +15,82 @@
     v_month_start DATE\cf4 \strokec4 ;\cf2 \strokec2 \
     v_schedule RECORD\cf4 \strokec4 ;\cf2 \strokec2 \
     v_sessions_detail JSONB\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_effective_duration INTEGER\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Hilfsvariable f\'fcr die Dauer\cf2 \strokec2 \
 BEGIN\
-    v_month_start :\cf5 \strokec5 =\cf2 \strokec2  DATE_TRUNC\cf4 \strokec4 (\cf6 \strokec6 'month'\cf4 \strokec4 ,\cf2 \strokec2  p_period_start\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
-    \
-    \cf7 \strokec7 -- Suche nach passendem Schedule\cf2 \strokec2 \
+    v_month_start :\cf6 \strokec6 =\cf2 \strokec2  DATE_TRUNC\cf4 \strokec4 (\cf7 \strokec7 'month'\cf4 \strokec4 ,\cf2 \strokec2  p_period_start\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    \cf5 \strokec5 -- Suche nach passendem Schedule und berechne die effektive Dauer\cf2 \strokec2 \
     \cf8 \strokec8 SELECT\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 units_count\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 total_price\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 description\cf4 \strokec4 ,\cf2 \strokec2 \
-        \cf7 \strokec7 -- KORREKTUR 2: Eindeutiger Alias\cf2 \strokec2 \
-        COALESCE\cf4 \strokec4 (\cf2 \strokec2 cms\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2  c\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 )\cf2 \strokec2  \cf8 \strokec8 as\cf2 \strokec2  effective_unit_duration\cf4 \strokec4 ,\cf2 \strokec2  \
+        \cf5 \strokec5 -- Berechne die Dauer hier\cf2 \strokec2 \
+        COALESCE\cf4 \strokec4 (\cf2 \strokec2 cms\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2  c\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 )\cf2 \strokec2  \cf8 \strokec8 AS\cf2 \strokec2  calculated_duration\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 weekdays\cf4 \strokec4 ,\cf2 \strokec2 \
         cms\cf4 \strokec4 .\cf2 \strokec2 start_time\
     \cf8 \strokec8 INTO\cf2 \strokec2  v_schedule\
-    \cf8 \strokec8 FROM\cf2 \strokec2  course_monthly_schedules cms\
-    \cf5 \strokec5 JOIN\cf2 \strokec2  courses c \cf8 \strokec8 ON\cf2 \strokec2  c\cf4 \strokec4 .\cf2 \strokec2 id \cf5 \strokec5 =\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 course_id\
-    \cf8 \strokec8 WHERE\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 course_id \cf5 \strokec5 =\cf2 \strokec2  p_course_id\
-        \cf5 \strokec5 AND\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 month_start \cf5 \strokec5 =\cf2 \strokec2  v_month_start\
-        \cf5 \strokec5 AND\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 is_active \cf5 \strokec5 =\cf2 \strokec2  \cf8 \strokec8 true\cf2 \strokec2 \
+    \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 course_monthly_schedules cms\
+    \cf6 \strokec6 JOIN\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 courses c \cf8 \strokec8 ON\cf2 \strokec2  c\cf4 \strokec4 .\cf2 \strokec2 id \cf6 \strokec6 =\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 course_id\
+    \cf8 \strokec8 WHERE\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 course_id \cf6 \strokec6 =\cf2 \strokec2  p_course_id\
+        \cf6 \strokec6 AND\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 month_start \cf6 \strokec6 =\cf2 \strokec2  v_month_start\
+        \cf6 \strokec6 AND\cf2 \strokec2  cms\cf4 \strokec4 .\cf2 \strokec2 is_active \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 true\cf2 \strokec2 \
     \cf8 \strokec8 LIMIT\cf2 \strokec2  \cf9 \strokec9 1\cf4 \strokec4 ;\cf2 \strokec2 \
-    \
-    IF \cf5 \strokec5 NOT\cf2 \strokec2  FOUND \cf8 \strokec8 THEN\cf2 \strokec2 \
-        RAISE EXCEPTION \cf6 \strokec6 'Kein Preisplan f\'fcr Kurs % im Monat % gefunden! ...'\cf4 \strokec4 ,\cf2 \strokec2  \
-            p_course_id\cf4 \strokec4 ,\cf2 \strokec2  v_month_start\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    IF \cf6 \strokec6 NOT\cf2 \strokec2  FOUND \cf8 \strokec8 THEN\cf2 \strokec2 \
+        RAISE EXCEPTION \cf7 \strokec7 'Kein aktiver Preisplan f\'fcr Kurs % im Monat % gefunden!'\cf4 \strokec4 ,\cf2 \strokec2 \
+            p_course_id\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 v_month_start\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'YYYY-MM'\cf4 \strokec4 );\cf2 \strokec2 \
     \cf8 \strokec8 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
-    \
-    \cf7 \strokec7 -- KORREKTUR 1: COALESCE f\'e4ngt NULL-Ergebnisse von jsonb_agg ab\cf2 \strokec2 \
+\
+    \cf5 \strokec5 -- Weise die berechnete Dauer der Hilfsvariable zu\cf2 \strokec2 \
+    v_effective_duration :\cf6 \strokec6 =\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 calculated_duration\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+    \cf5 \strokec5 -- Pr\'fcfe, ob die Dauer g\'fcltig ist\cf2 \strokec2 \
+    IF v_effective_duration \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf6 \strokec6 OR\cf2 \strokec2  v_effective_duration \cf6 \strokec6 <=\cf2 \strokec2  \cf9 \strokec9 0\cf2 \strokec2  \cf8 \strokec8 THEN\cf2 \strokec2 \
+        RAISE EXCEPTION \cf7 \strokec7 'Ung\'fcltige oder fehlende unit_duration_minutes f\'fcr Kurs % im Monat %.'\cf4 \strokec4 ,\cf2 \strokec2 \
+            p_course_id\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 v_month_start\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'YYYY-MM'\cf4 \strokec4 );\cf2 \strokec2 \
+    \cf8 \strokec8 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+\
+    \cf5 \strokec5 -- Erzeuge sessions_detail JSONB mit der korrekten Dauer\cf2 \strokec2 \
     \cf8 \strokec8 SELECT\cf2 \strokec2  COALESCE\cf4 \strokec4 (\cf2 \strokec2 \
         \cf4 \strokec4 (\cf2 \strokec2 \
-            \cf7 \strokec7 -- Die Abfrage, die die Termine generiert\cf2 \strokec2 \
             \cf8 \strokec8 SELECT\cf2 \strokec2  jsonb_agg\cf4 \strokec4 (\cf2 \strokec2 \
                 jsonb_build_object\cf4 \strokec4 (\cf2 \strokec2 \
-                    \cf6 \strokec6 'date_formatted'\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 session_date\cf4 \strokec4 ,\cf2 \strokec2  \cf6 \strokec6 'DD.MM.YYYY'\cf4 \strokec4 ),\cf2 \strokec2 \
-                    \cf6 \strokec6 'weekday_name'\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 session_date\cf4 \strokec4 ,\cf2 \strokec2  \cf6 \strokec6 'TMDay'\cf4 \strokec4 ),\cf2 \strokec2 \
-                    \cf6 \strokec6 'time'\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 start_time\cf4 \strokec4 ,\cf2 \strokec2  \cf6 \strokec6 'HH24:MI'\cf4 \strokec4 ),\cf2 \strokec2 \
-                    \cf6 \strokec6 'units'\cf4 \strokec4 ,\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
-                    \cf6 \strokec6 'unit_duration'\cf4 \strokec4 ,\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 effective_unit_duration\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 -- Verwendung des neuen Alias\cf2 \strokec2 \
-                    \cf6 \strokec6 'duration_minutes'\cf4 \strokec4 ,\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_per_slot \cf5 \strokec5 *\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 effective_unit_duration\cf4 \strokec4 )\cf2 \strokec2 \
+                    \cf7 \strokec7 'date_formatted'\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 session_date\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'DD.MM.YYYY'\cf4 \strokec4 ),\cf2 \strokec2 \
+                    \cf7 \strokec7 'weekday_name'\cf4 \strokec4 ,\cf2 \strokec2  get_german_weekday_name\cf4 \strokec4 (\cf2 \strokec2 EXTRACT\cf4 \strokec4 (\cf2 \strokec2 ISODOW \cf8 \strokec8 FROM\cf2 \strokec2  session_date\cf4 \strokec4 )\cf2 \strokec2 ::INTEGER\cf4 \strokec4 ),\cf2 \strokec2 \
+                    \cf7 \strokec7 'time'\cf4 \strokec4 ,\cf2 \strokec2  to_char\cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 start_time\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'HH24:MI'\cf4 \strokec4 ),\cf2 \strokec2 \
+                    \cf7 \strokec7 'units'\cf4 \strokec4 ,\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
+                    \cf5 \strokec5 -- KORREKTUR HIER:\cf2 \strokec2 \
+                    \cf7 \strokec7 'unit_duration'\cf4 \strokec4 ,\cf2 \strokec2  v_effective_duration\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Verwende die Hilfsvariable\cf2 \strokec2 \
+                    \cf7 \strokec7 'duration_minutes'\cf4 \strokec4 ,\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_per_slot \cf6 \strokec6 *\cf2 \strokec2  v_effective_duration\cf4 \strokec4 )\cf2 \strokec2  \cf5 \strokec5 -- Verwende die Hilfsvariable\cf2 \strokec2 \
                 \cf4 \strokec4 )\cf2 \strokec2 \
                 \cf8 \strokec8 ORDER\cf2 \strokec2  BY session_date\
             \cf4 \strokec4 )\cf2 \strokec2 \
             \cf8 \strokec8 FROM\cf2 \strokec2  generate_series\cf4 \strokec4 (\cf2 \strokec2 \
                 p_period_start\cf4 \strokec4 ,\cf2 \strokec2 \
                 p_period_end\cf4 \strokec4 ,\cf2 \strokec2 \
-                \cf6 \strokec6 '1 day'\cf2 \strokec2 ::interval\
+                \cf7 \strokec7 '1 day'\cf2 \strokec2 ::interval\
             \cf4 \strokec4 )\cf2 \strokec2  \cf8 \strokec8 AS\cf2 \strokec2  t\cf4 \strokec4 (\cf2 \strokec2 session_date\cf4 \strokec4 )\cf2 \strokec2 \
-            \cf8 \strokec8 WHERE\cf2 \strokec2  EXTRACT\cf4 \strokec4 (\cf2 \strokec2 ISODOW \cf8 \strokec8 FROM\cf2 \strokec2  session_date\cf4 \strokec4 )\cf2 \strokec2  \cf5 \strokec5 =\cf2 \strokec2  ANY\cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 weekdays\cf4 \strokec4 )\cf2 \strokec2 \
-              \cf5 \strokec5 AND\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 weekdays \cf5 \strokec5 IS\cf2 \strokec2  \cf5 \strokec5 NOT\cf2 \strokec2  \cf5 \strokec5 NULL\cf2 \strokec2 \
+            \cf8 \strokec8 WHERE\cf2 \strokec2  EXTRACT\cf4 \strokec4 (\cf2 \strokec2 ISODOW \cf8 \strokec8 FROM\cf2 \strokec2  session_date\cf4 \strokec4 )\cf2 \strokec2  \cf6 \strokec6 =\cf2 \strokec2  ANY\cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 weekdays\cf4 \strokec4 )\cf2 \strokec2 \
+              \cf6 \strokec6 AND\cf2 \strokec2  v_schedule\cf4 \strokec4 .\cf2 \strokec2 weekdays \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NOT\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf6 \strokec6 AND\cf2 \strokec2  array_length\cf4 \strokec4 (\cf2 \strokec2 v_schedule\cf4 \strokec4 .\cf2 \strokec2 weekdays\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 1\cf4 \strokec4 )\cf2 \strokec2  \cf6 \strokec6 >\cf2 \strokec2  \cf9 \strokec9 0\cf2 \strokec2 \
         \cf4 \strokec4 ),\cf2 \strokec2 \
-        \cf6 \strokec6 '[]'\cf2 \strokec2 ::jsonb \cf7 \strokec7 -- Der Fallback-Wert: ein leeres JSON-Array\cf2 \strokec2 \
+        \cf7 \strokec7 '[]'\cf2 \strokec2 ::jsonb\
     \cf4 \strokec4 )\cf2 \strokec2 \
-    \cf8 \strokec8 INTO\cf2 \strokec2  v_sessions_detail\cf4 \strokec4 ;\cf2 \strokec2  \cf7 \strokec7 -- Variable wird jetzt '[]' statt NULL\cf2 \strokec2 \
-    \
-    \
-    \cf7 \strokec7 -- Schedule gefunden, returniere die Werte\cf2 \strokec2 \
+    \cf8 \strokec8 INTO\cf2 \strokec2  v_sessions_detail\cf4 \strokec4 ;\cf2 \strokec2 \
+\
+\
+    \cf5 \strokec5 -- Schedule gefunden, returniere die Werte (wie im vorherigen Fix)\cf2 \strokec2 \
     RETURN QUERY \cf8 \strokec8 SELECT\cf2 \strokec2 \
         v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_count\cf4 \strokec4 ,\cf2 \strokec2 \
         v_schedule\cf4 \strokec4 .\cf2 \strokec2 price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
         v_schedule\cf4 \strokec4 .\cf2 \strokec2 total_price\cf4 \strokec4 ,\cf2 \strokec2 \
         v_schedule\cf4 \strokec4 .\cf2 \strokec2 description\cf4 \strokec4 ,\cf2 \strokec2 \
-        v_schedule\cf4 \strokec4 .\cf2 \strokec2 effective_unit_duration\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 -- Verwendung des neuen Alias\cf2 \strokec2 \
+        v_effective_duration\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Gib die berechnete Dauer zur\'fcck\cf2 \strokec2 \
         v_schedule\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
-        v_sessions_detail\cf4 \strokec4 ;\cf2 \strokec2  \cf7 \strokec7 -- Dieser Wert ist jetzt garantiert nie NULL\cf2 \strokec2 \
+        v_sessions_detail\cf4 \strokec4 ;\cf2 \strokec2 \
+\
 \cf8 \strokec8 END\cf4 \strokec4 ;\cf2 \strokec2 \
 \
 }

@@ -53,7 +53,10 @@
 \cb3       \cf6 \strokec6 'first_name'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       \cf6 \strokec6 'last_name'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       \cf6 \strokec6 'email'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
-\cb3       \cf6 \strokec6 'course_id'\cf4 \cb1 \strokec4 \
+\cb3       \cf6 \strokec6 'course_id'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       \cf6 \strokec6 'address'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       \cf6 \strokec6 'zip_code'\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       \cf6 \strokec6 'city'\cf4 \strokec4  \cf9 \strokec9 // NEU\cf4 \cb1 \strokec4 \
 \cb3     \cf5 \strokec5 ];\cf4 \cb1 \strokec4 \
 \cb3     \cf2 \strokec2 for\cf4 \strokec4  \cf5 \strokec5 (\cf2 \strokec2 const\cf4 \strokec4  field \cf2 \strokec2 of\cf4 \strokec4  requiredFields\cf5 \strokec5 )\{\cf4 \cb1 \strokec4 \
 \cb3       \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (!\cf4 \strokec4 requestData\cf5 \strokec5 [\cf4 \strokec4 field\cf5 \strokec5 ]\cf4 \strokec4  \cf5 \strokec5 ||\cf4 \strokec4  requestData\cf5 \strokec5 [\cf4 \strokec4 field\cf5 \strokec5 ].\cf4 \strokec4 toString\cf5 \strokec5 ().\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 ===\cf4 \strokec4  \cf6 \strokec6 ''\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
@@ -133,7 +136,10 @@
 \cb3         first_name\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 first_name\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 (),\cf4 \cb1 \strokec4 \
 \cb3         last_name\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 last_name\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 (),\cf4 \cb1 \strokec4 \
 \cb3         email\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 email\cf5 \strokec5 .\cf4 \strokec4 toLowerCase\cf5 \strokec5 ().\cf4 \strokec4 trim\cf5 \strokec5 (),\cf4 \cb1 \strokec4 \
-\cb3         phone\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone \cf5 \strokec5 ?\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 null\cf4 \cb1 \strokec4 \
+\cb3         phone\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone \cf5 \strokec5 ?\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 null\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3         address\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 address\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 (),\cf4 \cb1 \strokec4 \
+\cb3         zip_code\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 zip_code\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 (),\cf4 \cb1 \strokec4 \
+\cb3         city\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 city\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf9 \strokec9 // NEU\cf4 \cb1 \strokec4 \
 \cb3       \cf5 \strokec5 \}).\cf4 \strokec4 select\cf5 \strokec5 (\cf6 \strokec6 'id'\cf5 \strokec5 ).\cf4 \strokec4 single\cf5 \strokec5 ();\cf4 \cb1 \strokec4 \
 \cb3       \cf2 \strokec2 if\cf4 \strokec4  \cf5 \strokec5 (\cf4 \strokec4 userError \cf5 \strokec5 ||\cf4 \strokec4  \cf5 \strokec5 !\cf4 \strokec4 newUser\cf5 \strokec5 )\cf4 \strokec4  \cf5 \strokec5 \{\cf4 \cb1 \strokec4 \
 \cb3         console\cf5 \strokec5 .\cf4 \strokec4 error\cf5 \strokec5 (\cf6 \strokec6 'User creation error:'\cf5 \strokec5 ,\cf4 \strokec4  userError\cf5 \strokec5 );\cf4 \cb1 \strokec4 \
@@ -175,6 +181,7 @@
 \cb3       course_id\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 course_id\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       language_level\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 language_level \cf5 \strokec5 ||\cf4 \strokec4  \cf2 \strokec2 null\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       phone\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone \cf5 \strokec5 ?\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 phone\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 null\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
+\cb3       \cf9 \strokec9 // Adresse wird NICHT hier gespeichert, sondern nur beim User\cf4 \cb1 \strokec4 \
 \cb3       additional_info\cf5 \strokec5 :\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 additional_info \cf5 \strokec5 ?\cf4 \strokec4  requestData\cf5 \strokec5 .\cf4 \strokec4 additional_info\cf5 \strokec5 .\cf4 \strokec4 trim\cf5 \strokec5 ()\cf4 \strokec4  \cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 null\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       consent\cf5 \strokec5 :\cf4 \strokec4  \cf2 \strokec2 true\cf5 \strokec5 ,\cf4 \cb1 \strokec4 \
 \cb3       status\cf5 \strokec5 :\cf4 \strokec4  \cf6 \strokec6 'pending'\cf4 \cb1 \strokec4 \

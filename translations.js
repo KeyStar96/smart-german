@@ -19,6 +19,13 @@ const translations = {
         day_short_mi: "Mi",
         day_short_do: "Do",
         day_short_fr: "Fr",
+
+        msg_error_field_missing: 'Bitte füllen Sie das Feld "%s" aus.',
+        msg_error_zip_invalid: 'Bitte geben Sie eine gültige 5-stellige PLZ ein.',
+        msg_error_email_invalid: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+        modal_register_address: "Adresse (Straße & Nr.)*",
+        modal_register_zip: "PLZ*",
+        modal_register_city: "Stadt*",
         
         // Hero Section
         hero_title: "Sprache & Kultur leicht gemacht",
@@ -430,6 +437,13 @@ const translations = {
         day_short_mi: "Ср",
         day_short_do: "Чт",
         day_short_fr: "Пт",
+
+        modal_register_address: "Адрес (Улица и №)*",
+        modal_register_zip: "Индекс*",
+        modal_register_city: "Город*",
+        msg_error_field_missing: 'Пожалуйста, заполните поле "%s".',
+        msg_error_zip_invalid: 'Пожалуйста, введите действительный 5-значный почтовый индекс.',
+        msg_error_email_invalid: 'Пожалуйста, введите действительный адрес электронной почты.',
         
         // Hero Section
         hero_title: "Язык и культура - просто!",
@@ -842,6 +856,13 @@ const translations = {
         day_short_mi: "Ср",
         day_short_do: "Чт",
         day_short_fr: "Пт",
+
+        modal_register_address: "Адреса (Вулиця та №)*",
+        modal_register_zip: "Індекс*",
+        modal_register_city: "Місто*",
+        msg_error_field_missing: 'Будь ласка, заповніть поле "%s".',
+        msg_error_zip_invalid: 'Будь ласка, введіть дійсний 5-значний поштовий індекс.',
+        msg_error_email_invalid: 'Будь ласка, введіть дійсну адресу електронної пошти.',
         
         // Hero Section
         hero_title: "Мова і культура - легко!",
@@ -1257,6 +1278,13 @@ const translations = {
         day_short_mi: "Wed",
         day_short_do: "Thu",
         day_short_fr: "Fri",
+
+        msg_error_field_missing: 'Please fill in the field "%s".',
+        msg_error_zip_invalid: 'Please enter a valid 5-digit ZIP code.',
+        msg_error_email_invalid: 'Please enter a valid email address.',
+        modal_register_address: "Address (Street & No.)*",
+        modal_register_zip: "ZIP Code*",
+        modal_register_city: "City*",
         
         // Hero Section
         hero_title: "Language & Culture Made Easy",

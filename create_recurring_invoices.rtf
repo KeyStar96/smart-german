@@ -1,129 +1,122 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2709
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
 {\colortbl;\red255\green255\blue255;\red202\green202\blue202;\red24\green24\blue24;\red212\green212\blue212;
-\red83\green83\blue83;\red100\green117\blue135;\red167\green197\blue152;\red36\green168\blue107;\red70\green137\blue204;
+\red100\green117\blue135;\red167\green197\blue152;\red36\green168\blue107;\red70\green137\blue204;\red83\green83\blue83;
 }
 {\*\expandedcolortbl;;\cssrgb\c83137\c83137\c83137;\cssrgb\c12157\c12157\c12157;\cssrgb\c86275\c86275\c86275;
-\cssrgb\c40000\c40000\c40000;\cssrgb\c46667\c53333\c60000;\cssrgb\c70980\c80784\c65882;\cssrgb\c14118\c70588\c49412;\cssrgb\c33725\c61176\c83922;
+\cssrgb\c46667\c53333\c60000;\cssrgb\c70980\c80784\c65882;\cssrgb\c14118\c70588\c49412;\cssrgb\c33725\c61176\c83922;\cssrgb\c40000\c40000\c40000;
 }
 \paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
 \deftab720
 \pard\pardeftab720\partightenfactor0
 
 \f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
-\outl0\strokewidth0 \strokec2 DECLARE\cb1 \
-\cb3     confirmed_registration RECORD\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Schleifenvariable f\'fcr best\'e4tigte Registrierungen\cf2 \cb1 \strokec2 \
-\cb3     last_invoice RECORD\cf4 \strokec4 ;\cf2 \strokec2            \cf5 \strokec5 -- Zum Pr\'fcfen, ob Rechnung schon existiert\cf2 \cb1 \strokec2 \
-\cb3     next_month_start DATE\cf4 \strokec4 ;\cf2 \strokec2          \cf5 \strokec5 -- Erster Tag des n\'e4chsten Monats\cf2 \cb1 \strokec2 \
-\cb3     next_month_end DATE\cf4 \strokec4 ;\cf2 \strokec2            \cf5 \strokec5 -- Letzter Tag des n\'e4chsten Monats\cf2 \cb1 \strokec2 \
-\cb3     new_invoice_id UUID\cf4 \strokec4 ;\cf2 \strokec2            \cf5 \strokec5 -- ID der neu erstellten Rechnung\cf2 \cb1 \strokec2 \
-\cb3     user_email TEXT\cf4 \strokec4 ;\cf2 \strokec2                \cf5 \strokec5 -- E-Mail des Nutzers\cf2 \cb1 \strokec2 \
-\cb3     course_name TEXT\cf4 \strokec4 ;\cf2 \strokec2               \cf5 \strokec5 -- Name des Kurses\cf2 \cb1 \strokec2 \
-\cb3     counter INT :\cf6 \strokec6 =\cf2 \strokec2  \cf7 \strokec7 0\cf4 \strokec4 ;\cf2 \strokec2               \cf5 \strokec5 -- Z\'e4hler f\'fcr erstellte Rechnungen\cf2 \cb1 \strokec2 \
-\cb3     v_pricing RECORD\cf4 \strokec4 ;\cf2 \strokec2               \cf5 \strokec5 -- Ergebnis von get_course_price_for_period\cf2 \cb1 \strokec2 \
-\cb3     v_enrollment_id UUID\cf4 \strokec4 ;\cf2 \strokec2           \cf5 \strokec5 -- Zugeh\'f6rige Enrollment ID\cf2 \cb1 \strokec2 \
-\cb3     v_due_date DATE\cf4 \strokec4 ;\cf2 \strokec2                \cf5 \strokec5 -- Berechnetes F\'e4lligkeitsdatum\cf2 \cb1 \strokec2 \
-\cb3 BEGIN\cb1 \
-\cb3     \cf5 \strokec5 -- N\'e4chsten Monat berechnen\cf2 \cb1 \strokec2 \
-\cb3     next_month_start :\cf6 \strokec6 =\cf2 \strokec2  DATE_TRUNC\cf4 \strokec4 (\cf8 \strokec8 'month'\cf4 \strokec4 ,\cf2 \strokec2  CURRENT_DATE \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 month'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
-\cb3     next_month_end :\cf6 \strokec6 =\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 next_month_start \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 month'\cf2 \strokec2  \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '1 day'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+\outl0\strokewidth0 \strokec2 DECLARE\
+    confirmed_registration RECORD\cf4 \strokec4 ;\cf2 \strokec2 \
+    last_invoice RECORD\cf4 \strokec4 ;\cf2 \strokec2 \
+    next_month_start DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+    next_month_end DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+    new_invoice_id UUID\cf4 \strokec4 ;\cf2 \strokec2 \
+    user_email TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
+    course_name TEXT\cf4 \strokec4 ;\cf2 \strokec2 \
+    counter INT :\cf5 \strokec5 =\cf2 \strokec2  \cf6 \strokec6 0\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_pricing RECORD\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_enrollment_id UUID\cf4 \strokec4 ;\cf2 \strokec2 \
+    v_due_date DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+BEGIN\
+    next_month_start :\cf5 \strokec5 =\cf2 \strokec2  DATE_TRUNC\cf4 \strokec4 (\cf7 \strokec7 'month'\cf4 \strokec4 ,\cf2 \strokec2  CURRENT_DATE \cf5 \strokec5 +\cf2 \strokec2  INTERVAL \cf7 \strokec7 '1 month'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
+    next_month_end :\cf5 \strokec5 =\cf2 \strokec2  \cf4 \strokec4 (\cf2 \strokec2 next_month_start \cf5 \strokec5 +\cf2 \strokec2  INTERVAL \cf7 \strokec7 '1 month'\cf2 \strokec2  \cf5 \strokec5 -\cf2 \strokec2  INTERVAL \cf7 \strokec7 '1 day'\cf4 \strokec4 )\cf2 \strokec2 ::DATE\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3     \cf5 \strokec5 -- Nur ausf\'fchren, wenn wir maximal 14 Tage vor Monatsbeginn sind\cf2 \cb1 \strokec2 \
-\cb3     IF next_month_start \cf6 \strokec6 >\cf2 \strokec2  CURRENT_DATE \cf6 \strokec6 +\cf2 \strokec2  INTERVAL \cf8 \strokec8 '14 days'\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \cb1 \strokec2 \
-\cb3         RETURN format\cf4 \strokec4 (\cf8 \strokec8 'Zu fr\'fch - Rechnungen werden 14 Tage vor Monatsbeginn generiert. N\'e4chster Lauf: %s'\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                       TO_CHAR\cf4 \strokec4 (\cf2 \strokec2 next_month_start \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '14 days'\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'DD.MM.YYYY'\cf4 \strokec4 ));\cf2 \cb1 \strokec2 \
-\cb3     \cf9 \strokec9 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+    IF next_month_start \cf5 \strokec5 >\cf2 \strokec2  CURRENT_DATE \cf5 \strokec5 +\cf2 \strokec2  INTERVAL \cf7 \strokec7 '14 days'\cf2 \strokec2  \cf8 \strokec8 THEN\cf2 \strokec2 \
+        RETURN format\cf4 \strokec4 (\cf7 \strokec7 'Zu fr\'fch - Rechnungen werden 14 Tage vor Monatsbeginn generiert. N\'e4chster Lauf: %s'\cf4 \strokec4 ,\cf2 \strokec2 \
+                      TO_CHAR\cf4 \strokec4 (\cf2 \strokec2 next_month_start \cf5 \strokec5 -\cf2 \strokec2  INTERVAL \cf7 \strokec7 '14 days'\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'DD.MM.YYYY'\cf4 \strokec4 ));\cf2 \strokec2 \
+    \cf8 \strokec8 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3     \cf5 \strokec5 -- Standard-F\'e4lligkeitsdatum f\'fcr wiederkehrende Rechnungen: 7 Tage vor Monatsbeginn\cf2 \cb1 \strokec2 \
-\cb3     v_due_date :\cf6 \strokec6 =\cf2 \strokec2  next_month_start \cf6 \strokec6 -\cf2 \strokec2  INTERVAL \cf8 \strokec8 '7 days'\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+    v_due_date :\cf5 \strokec5 =\cf2 \strokec2  next_month_start \cf5 \strokec5 -\cf2 \strokec2  INTERVAL \cf7 \strokec7 '7 days'\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3     \cf5 \strokec5 -- Finde alle best\'e4tigten Registrierungen, f\'fcr die potenziell eine Folgerechnung erstellt werden muss\cf2 \cb1 \strokec2 \
-\cb3     \cf9 \strokec9 FOR\cf2 \strokec2  confirmed_registration \cf6 \strokec6 IN\cf2 \cb1 \strokec2 \
-\cb3         \cf9 \strokec9 SELECT\cf2 \strokec2  r\cf4 \strokec4 .\cf6 \strokec6 *\cf2 \cb1 \strokec2 \
-\cb3         \cf9 \strokec9 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 registrations r\cb1 \
-\cb3         \cf6 \strokec6 JOIN\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments e \cf9 \strokec9 ON\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 id \cf6 \strokec6 =\cf2 \strokec2  e\cf4 \strokec4 .\cf2 \strokec2 registration_id\cb1 \
-\cb3         \cf5 \strokec5 -- Nur f\'fcr Registrierungen mit aktivem oder pending Enrollment (nicht cancelled/completed)\cf2 \cb1 \strokec2 \
-\cb3         \cf9 \strokec9 WHERE\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 =\cf2 \strokec2  \cf8 \strokec8 'confirmed'\cf2 \strokec2  \cf6 \strokec6 AND\cf2 \strokec2  e\cf4 \strokec4 .\cf2 \strokec2 status \cf6 \strokec6 IN\cf2 \strokec2  \cf4 \strokec4 (\cf8 \strokec8 'active'\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'pending'\cf4 \strokec4 )\cf2 \cb1 \strokec2 \
-\cb3     LOOP\cb1 \
-\cb3         \cf5 \strokec5 -- Pr\'fcfe, ob bereits eine Rechnung f\'fcr diesen Nutzer, Kurs und den n\'e4chsten Monat existiert\cf2 \cb1 \strokec2 \
-\cb3         \cf9 \strokec9 SELECT\cf2 \strokec2  id \cf9 \strokec9 INTO\cf2 \strokec2  last_invoice\cb1 \
-\cb3         \cf9 \strokec9 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices inv\cb1 \
-\cb3         \cf9 \strokec9 WHERE\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 user_id \cf6 \strokec6 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\cb1 \
-\cb3           \cf6 \strokec6 AND\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 course_id \cf6 \strokec6 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cb1 \
-\cb3           \cf6 \strokec6 AND\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 billing_period_start \cf6 \strokec6 =\cf2 \strokec2  next_month_start\cb1 \
-\cb3         \cf9 \strokec9 LIMIT\cf2 \strokec2  \cf7 \strokec7 1\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+    \cf8 \strokec8 FOR\cf2 \strokec2  confirmed_registration \cf5 \strokec5 IN\cf2 \strokec2 \
+        \cf8 \strokec8 SELECT\cf2 \strokec2  r\cf4 \strokec4 .\cf5 \strokec5 *\cf2 \strokec2 \
+        \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 registrations r\
+        \cf5 \strokec5 JOIN\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments e \cf8 \strokec8 ON\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 id \cf5 \strokec5 =\cf2 \strokec2  e\cf4 \strokec4 .\cf2 \strokec2 registration_id\
+        \cf8 \strokec8 WHERE\cf2 \strokec2  r\cf4 \strokec4 .\cf2 \strokec2 status \cf5 \strokec5 =\cf2 \strokec2  \cf7 \strokec7 'confirmed'\cf2 \strokec2  \cf5 \strokec5 AND\cf2 \strokec2  e\cf4 \strokec4 .\cf2 \strokec2 status \cf5 \strokec5 IN\cf2 \strokec2  \cf4 \strokec4 (\cf7 \strokec7 'active'\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'pending'\cf4 \strokec4 )\cf2 \strokec2 \
+    LOOP\
+        \cf8 \strokec8 SELECT\cf2 \strokec2  id \cf8 \strokec8 INTO\cf2 \strokec2  last_invoice\
+        \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices inv\
+        \cf8 \strokec8 WHERE\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 user_id \cf5 \strokec5 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\
+          \cf5 \strokec5 AND\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 course_id \cf5 \strokec5 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\
+          \cf5 \strokec5 AND\cf2 \strokec2  inv\cf4 \strokec4 .\cf2 \strokec2 billing_period_start \cf5 \strokec5 =\cf2 \strokec2  next_month_start\
+        \cf8 \strokec8 LIMIT\cf2 \strokec2  \cf6 \strokec6 1\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3         \cf5 \strokec5 -- Nur erstellen, wenn noch keine Rechnung f\'fcr diesen Zeitraum existiert\cf2 \cb1 \strokec2 \
-\cb3         IF last_invoice \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \cb1 \strokec2 \
+        IF last_invoice \cf5 \strokec5 IS\cf2 \strokec2  \cf5 \strokec5 NULL\cf2 \strokec2  \cf8 \strokec8 THEN\cf2 \strokec2 \
+            \cf8 \strokec8 SELECT\cf2 \strokec2  id \cf8 \strokec8 INTO\cf2 \strokec2  v_enrollment_id\
+            \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments\
+            \cf8 \strokec8 WHERE\cf2 \strokec2  registration_id \cf5 \strokec5 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 id\
+            \cf8 \strokec8 LIMIT\cf2 \strokec2  \cf6 \strokec6 1\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3             \cf5 \strokec5 -- Finde das zugeh\'f6rige Enrollment (sollte existieren wegen JOIN oben)\cf2 \cb1 \strokec2 \
-\cb3             \cf9 \strokec9 SELECT\cf2 \strokec2  id \cf9 \strokec9 INTO\cf2 \strokec2  v_enrollment_id\cb1 \
-\cb3             \cf9 \strokec9 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 enrollments\cb1 \
-\cb3             \cf9 \strokec9 WHERE\cf2 \strokec2  registration_id \cf6 \strokec6 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 id\cb1 \
-\cb3             \cf9 \strokec9 LIMIT\cf2 \strokec2  \cf7 \strokec7 1\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Zur Sicherheit, falls es mehrere g\'e4be\cf2 \cb1 \strokec2 \
+            IF v_enrollment_id \cf5 \strokec5 IS\cf2 \strokec2  \cf5 \strokec5 NOT\cf2 \strokec2  \cf5 \strokec5 NULL\cf2 \strokec2  \cf8 \strokec8 THEN\cf2 \strokec2 \
+                \cf8 \strokec8 SELECT\cf2 \strokec2  name \cf8 \strokec8 INTO\cf2 \strokec2  course_name \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 courses \cf8 \strokec8 WHERE\cf2 \strokec2  id \cf5 \strokec5 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ;\cf2 \strokec2 \
+                \cf8 \strokec8 SELECT\cf2 \strokec2  email \cf8 \strokec8 INTO\cf2 \strokec2  user_email \cf8 \strokec8 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 users \cf8 \strokec8 WHERE\cf2 \strokec2  id \cf5 \strokec5 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3             \cf5 \strokec5 -- Nur fortfahren, wenn ein Enrollment existiert (Sicherheitspr\'fcfung)\cf2 \cb1 \strokec2 \
-\cb3             IF v_enrollment_id \cf6 \strokec6 IS\cf2 \strokec2  \cf6 \strokec6 NOT\cf2 \strokec2  \cf6 \strokec6 NULL\cf2 \strokec2  \cf9 \strokec9 THEN\cf2 \cb1 \strokec2 \
+                \cf8 \strokec8 SELECT\cf2 \strokec2  \cf5 \strokec5 *\cf2 \strokec2  \cf8 \strokec8 INTO\cf2 \strokec2  v_pricing\
+                \cf8 \strokec8 FROM\cf2 \strokec2  get_course_price_for_period\cf4 \strokec4 (\cf2 \strokec2 \
+                    confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    next_month_start\cf4 \strokec4 ,\cf2 \strokec2 \
+                    next_month_end\
+                \cf4 \strokec4 );\cf2 \strokec2 \
 \
-\cb3                 \cf5 \strokec5 -- Kursname und Benutzer-E-Mail holen\cf2 \cb1 \strokec2 \
-\cb3                 \cf9 \strokec9 SELECT\cf2 \strokec2  name \cf9 \strokec9 INTO\cf2 \strokec2  course_name \cf9 \strokec9 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 courses \cf9 \strokec9 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
-\cb3                 \cf9 \strokec9 SELECT\cf2 \strokec2  email \cf9 \strokec9 INTO\cf2 \strokec2  user_email \cf9 \strokec9 FROM\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 users \cf9 \strokec9 WHERE\cf2 \strokec2  id \cf6 \strokec6 =\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+                \cf9 \strokec9 -- Rechnung erstellen - tax_amount und total_amount NICHT explizit angeben\cf2 \strokec2 \
+                INSERT \cf8 \strokec8 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices \cf4 \strokec4 (\cf2 \strokec2 \
+                    user_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    course_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    enrollment_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    amount\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 -- Bruttobetrag\cf2 \strokec2 \
+                    tax_rate\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 -- Explizit auf 0 setzen\cf2 \strokec2 \
+                    \cf9 \strokec9 -- tax_amount, -- ENTFERNT\cf2 \strokec2 \
+                    \cf9 \strokec9 -- total_amount, -- ENTFERNT\cf2 \strokec2 \
+                    units_count\cf4 \strokec4 ,\cf2 \strokec2 \
+                    price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
+                    description\cf4 \strokec4 ,\cf2 \strokec2 \
+                    unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
+                    units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
+                    sessions_detail\cf4 \strokec4 ,\cf2 \strokec2 \
+                    status\cf4 \strokec4 ,\cf2 \strokec2 \
+                    billing_period_start\cf4 \strokec4 ,\cf2 \strokec2 \
+                    billing_period_end\cf4 \strokec4 ,\cf2 \strokec2 \
+                    due_date\cf4 \strokec4 ,\cf2 \strokec2 \
+                    pdf_status\
+                \cf4 \strokec4 )\cf2 \strokec2 \
+                VALUES \cf4 \strokec4 (\cf2 \strokec2 \
+                    confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_enrollment_id\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 total_price\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 -- v_pricing.total_price als Brutto verwenden\cf2 \strokec2 \
+                    \cf6 \strokec6 0\cf4 \strokec4 ,\cf2 \strokec2  \cf9 \strokec9 -- tax_rate auf 0\cf2 \strokec2 \
+                    \cf9 \strokec9 -- 0, -- ENTFERNT\cf2 \strokec2 \
+                    \cf9 \strokec9 -- v_pricing.total_price, -- ENTFERNT\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 units_count\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 price_per_unit\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 description\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_pricing\cf4 \strokec4 .\cf2 \strokec2 sessions_detail\cf4 \strokec4 ,\cf2 \strokec2 \
+                    \cf7 \strokec7 'pending'\cf4 \strokec4 ,\cf2 \strokec2 \
+                    next_month_start\cf4 \strokec4 ,\cf2 \strokec2 \
+                    next_month_end\cf4 \strokec4 ,\cf2 \strokec2 \
+                    v_due_date\cf4 \strokec4 ,\cf2 \strokec2 \
+                    \cf7 \strokec7 'pending_generation'\cf2 \strokec2 \
+                \cf4 \strokec4 )\cf2 \strokec2 \
+                \cf8 \strokec8 RETURNING\cf2 \strokec2  id \cf8 \strokec8 INTO\cf2 \strokec2  new_invoice_id\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3                 \cf5 \strokec5 -- Preise und Details f\'fcr den n\'e4chsten Monat berechnen\cf2 \cb1 \strokec2 \
-\cb3                 \cf9 \strokec9 SELECT\cf2 \strokec2  \cf6 \strokec6 *\cf2 \strokec2  \cf9 \strokec9 INTO\cf2 \strokec2  v_pricing\cb1 \
-\cb3                 \cf9 \strokec9 FROM\cf2 \strokec2  get_course_price_for_period\cf4 \strokec4 (\cf2 \cb1 \strokec2 \
-\cb3                     confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     next_month_start\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     next_month_end\cb1 \
-\cb3                 \cf4 \strokec4 );\cf2 \cb1 \strokec2 \
+                counter :\cf5 \strokec5 =\cf2 \strokec2  counter \cf5 \strokec5 +\cf2 \strokec2  \cf6 \strokec6 1\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3                 \cf5 \strokec5 -- Rechnung erstellen und mit Enrollment verkn\'fcpfen\cf2 \cb1 \strokec2 \
-\cb3                 INSERT \cf9 \strokec9 INTO\cf2 \strokec2  public\cf4 \strokec4 .\cf2 \strokec2 invoices \cf4 \strokec4 (\cf2 \cb1 \strokec2 \
-\cb3                     user_id\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     course_id\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Verkn\'fcpfung zum bestehenden Enrollment\cf2 \cb1 \strokec2 \
-\cb3                     amount\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     units_count\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     price_per_unit\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     description\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     unit_duration_minutes\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Aus v_pricing\cf2 \cb1 \strokec2 \
-\cb3                     units_per_slot\cf4 \strokec4 ,\cf2 \strokec2         \cf5 \strokec5 -- Aus v_pricing\cf2 \cb1 \strokec2 \
-\cb3                     sessions_detail\cf4 \strokec4 ,\cf2 \strokec2        \cf5 \strokec5 -- Aus v_pricing\cf2 \cb1 \strokec2 \
-\cb3                     status\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     billing_period_start\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     billing_period_end\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     due_date\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Standard T-7 F\'e4lligkeit\cf2 \cb1 \strokec2 \
-\cb3                     pdf_status\cb1 \
-\cb3                 \cf4 \strokec4 )\cf2 \cb1 \strokec2 \
-\cb3                 VALUES \cf4 \strokec4 (\cf2 \cb1 \strokec2 \
-\cb3                     confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 user_id\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 course_id\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_enrollment_id\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Zugeh\'f6rige Enrollment ID\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 total_price\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 units_count\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 price_per_unit\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 description\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 unit_duration_minutes\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 units_per_slot\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_pricing\cf4 \strokec4 .\cf2 \strokec2 sessions_detail\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     \cf8 \strokec8 'pending'\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Status der neuen Rechnung\cf2 \cb1 \strokec2 \
-\cb3                     next_month_start\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     next_month_end\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                     v_due_date\cf4 \strokec4 ,\cf2 \strokec2  \cf5 \strokec5 -- Immer T-7\cf2 \cb1 \strokec2 \
-\cb3                     \cf8 \strokec8 'pending_generation'\cf2 \cb1 \strokec2 \
-\cb3                 \cf4 \strokec4 )\cf2 \cb1 \strokec2 \
-\cb3                 \cf9 \strokec9 RETURNING\cf2 \strokec2  id \cf9 \strokec9 INTO\cf2 \strokec2  new_invoice_id\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
+            \cf8 \strokec8 ELSE\cf2 \strokec2 \
+                 RAISE WARNING \cf7 \strokec7 '[create_recurring_invoices] Kein Enrollment f\'fcr best\'e4tigte Registration ID % gefunden. Keine Rechnung erstellt.'\cf4 \strokec4 ,\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ;\cf2 \strokec2 \
+            \cf8 \strokec8 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+        \cf8 \strokec8 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2 \
+    \cf8 \strokec8 END\cf2 \strokec2  LOOP\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3                 counter :\cf6 \strokec6 =\cf2 \strokec2  counter \cf6 \strokec6 +\cf2 \strokec2  \cf7 \strokec7 1\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Z\'e4hler erh\'f6hen\cf2 \cb1 \strokec2 \
+    RETURN format\cf4 \strokec4 (\cf7 \strokec7 'Wiederkehrende Rechnungen erstellt: %s neue Rechnungen f\'fcr %s'\cf4 \strokec4 ,\cf2 \strokec2 \
+                  counter\cf4 \strokec4 ,\cf2 \strokec2  TO_CHAR\cf4 \strokec4 (\cf2 \strokec2 next_month_start\cf4 \strokec4 ,\cf2 \strokec2  \cf7 \strokec7 'FMMonth YYYY'\cf4 \strokec4 ));\cf2 \strokec2 \
+\cf8 \strokec8 END\cf4 \strokec4 ;\cf2 \strokec2 \
 \
-\cb3             \cf9 \strokec9 ELSE\cf2 \cb1 \strokec2 \
-\cb3                 \cf5 \strokec5 -- Sollte durch den JOIN oben nicht passieren, aber als Sicherheitsnetz\cf2 \cb1 \strokec2 \
-\cb3                  RAISE WARNING \cf8 \strokec8 '[create_recurring_invoices] Kein Enrollment f\'fcr best\'e4tigte Registration ID % gefunden. Keine Rechnung erstellt.'\cf4 \strokec4 ,\cf2 \strokec2  confirmed_registration\cf4 \strokec4 .\cf2 \strokec2 id\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
-\cb3             \cf9 \strokec9 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Ende IF v_enrollment_id IS NOT NULL\cf2 \cb1 \strokec2 \
-\cb3         \cf9 \strokec9 END\cf2 \strokec2  IF\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Ende IF last_invoice IS NULL\cf2 \cb1 \strokec2 \
-\cb3     \cf9 \strokec9 END\cf2 \strokec2  LOOP\cf4 \strokec4 ;\cf2 \strokec2  \cf5 \strokec5 -- Ende FOR confirmed_registration\cf2 \cb1 \strokec2 \
-\
-\cb3     RETURN format\cf4 \strokec4 (\cf8 \strokec8 'Wiederkehrende Rechnungen erstellt: %s neue Rechnungen f\'fcr %s'\cf4 \strokec4 ,\cf2 \cb1 \strokec2 \
-\cb3                   counter\cf4 \strokec4 ,\cf2 \strokec2  TO_CHAR\cf4 \strokec4 (\cf2 \strokec2 next_month_start\cf4 \strokec4 ,\cf2 \strokec2  \cf8 \strokec8 'FMMonth YYYY'\cf4 \strokec4 ));\cf2 \cb1 \strokec2 \
-\cf9 \cb3 \strokec9 END\cf4 \strokec4 ;\cf2 \cb1 \strokec2 \
 }
